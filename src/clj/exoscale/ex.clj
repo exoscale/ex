@@ -1,6 +1,5 @@
 (ns exoscale.ex
-  (:require [clojure.spec.alpha :as s]
-            [clojure.tools.logging :as log])
+  (:require [clojure.spec.alpha :as s])
   (:refer-clojure :exclude [derive underive ancestors descendants isa? parents
                             set-validator!]))
 
