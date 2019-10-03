@@ -32,10 +32,11 @@ relations. It also comes with manifold support.
 
 So we have `exoscale.ex/try+`, which supports vanilla `catch`/`finally`
 clauses.
+
 If you specify a `catch-data` clause with a keyword as first argument
-things get interesting. We assume you always put a `:type` key in the
-ex-info you want to use with this, and will match its value to the
-value of the key in the `catch-data` clause.
+things get interesting. **We assume you always put a `:type` key in
+the ex-infos you generate**, and will match its value to the value of
+the key in the `catch-data` clause.
 
 ### The basics
 
