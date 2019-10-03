@@ -157,6 +157,9 @@ Within the namespace `:exoscale.ex`:
 | :fault | no | fix callee bug |
 | :busy | yes | backoff and retry |
 
+This is very much inspired by
+[cognitect-labs/anomalies](https://github.com/cognitect-labs/anomalies).
+
 TODO: add more, refine
 
 ## Usages examples
