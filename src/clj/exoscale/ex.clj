@@ -47,7 +47,6 @@
   [type spec]
   (defmethod ex-data-spec type [_] spec))
 
-(s/check-asserts true)
 (defn assert-ex-data-valid
   "ex-data Validator function"
   [ex-data]
