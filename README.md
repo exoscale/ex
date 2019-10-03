@@ -184,6 +184,10 @@ TODO: add more, refine
   predefined set of values from ELK or aggregate than searching on a
   string message.
 
+* Do not leak data that is meant to emutate a usage context
+  (cloudstack error codes, http status codes). That should be handled
+  by a middleware at the edges.
+
 * TODO
 
 ## Usages examples
