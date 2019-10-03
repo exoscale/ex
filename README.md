@@ -4,7 +4,7 @@ Exception handling library for clojure(+manifold)
 
 ## Rationale
 
-* We want to be able to express/handle exceptions via `ex-data` in a
+* We want to be able to express/handle exceptions via `ex-info` in a
 more formalised way.
 
 * We want to be able to support java like exceptions hierarchies,
