@@ -18,7 +18,7 @@ without having to define/extend classes.
 
 * We want to have the same mechanism for `manifold.deferred/catch`.
 
-* We don't want to incur a performance penalty.
+* We don't want to minimize any performance penalty it might have.
 
 * We don't want to emit `catch Throwable` (it's bad), stay as close as
   possible to what the user would write by hand.
