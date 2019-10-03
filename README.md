@@ -75,12 +75,9 @@ So you can do things like that.
 
 ### Exception hierarchies
 
-But there's a twist.
-
-I thought leveraging a clojure hierarchy could make sense in that
-context too, so you can essentially create exceptions hierarchies
-without having to mess with Java classes directly and in a
-clojuresque" way.
+We leverage a clojure hierarchy so you can essentially create
+exceptions relations/extending without having to mess with Java
+classes directly and in a clojuresque" way.
 
 ```clj
 ;; so bar is a foo
