@@ -162,6 +162,30 @@ This is very much inspired by
 
 TODO: add more, refine
 
+## How to generate/use good ex-infos
+
+* Specify a `:type` key **always**
+
+* The type key should either be one of our base type or a descendant
+
+* If it's a rethrow or comes from another exception pass the original
+  exception as `cause` (3rd arg of `ex-info`)
+
+* `ex-info`s should contain enough info but not too much (don't dump a
+  system/env map on its data)
+
+* If you use more than once the same `:type` you might want to spec it
+
+* Avoid returning raw values in error-deferreds, return properly
+  formated ex-infos
+  `(d/error-deferred ::foo) vs (d/error-deferred (ex-info ".." {...}))`
+
+* Have logging in mind when you create them. It's easier to pull
+  predefined set of values from ELK or aggregate than searching on a
+  string message.
+
+* TODO
+
 ## Usages examples
 
 Some real life examples of usage for this:
