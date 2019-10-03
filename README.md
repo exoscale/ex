@@ -163,10 +163,8 @@ TODO: add more, refine
 
 Some real life examples of usage for this:
 
-* make some exceptions end-user exposable in http responses via an
-  error middleware in a declarative way .
+* Deny all display of user exceptions to the end-user by default via
+  top level middleware and only mark the ones safe to show as
+  ::user-exposable in a declarative way.
 
 * skip sentry logging for some kind of exceptions (or the inverse)
-
-* make an exception hierarchy for our query language type of errors for
-  specialised reporting per "type"
