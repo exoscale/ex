@@ -1,4 +1,4 @@
-(defproject exoscale/ex "0.1.0"
+(defproject exoscale/ex "0.1.0-SNAPSHOT"
   :description "Yet another exception catching library"
   :url "https://github.com/exoscale/ex"
   :dependencies [[org.clojure/clojure "1.10.1"]]
