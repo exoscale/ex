@@ -27,7 +27,7 @@ without having to define/extend classes.
 
 This is an exception library, drop in replacement for
 `try`/`catch`/`finally`, that adds support for `ex-info`/`ex-data`
-with a custom (clojure) hierarchy that allows to express exceptions
+with a custom clojure hierarchy that allows to express exceptions
 relations. It also comes with manifold support.
 
 So we have `exoscale.ex/try+`, which supports vanilla `catch`/`finally`
@@ -78,7 +78,7 @@ So you can do things like that.
 
 We leverage a clojure hierarchy so you can essentially create
 exceptions relations/extending without having to mess with Java
-classes directly and in a clojuresque" way.
+classes directly.
 
 ```clj
 ;; so bar is a foo
@@ -109,7 +109,7 @@ of a `catch-data` block in `try+` but with a more manifold like feel.
 
 ### Specing your ex-infos data
 
-You can specify a clojure.spec for the ex-data via the multimethod at
+You can specify a clojure.spec for the `ex-data` via the multimethod at
 `:exoscale.ex/ex-data-spec` or via the sugar fn provided
 `exoscale.ex/set-ex-data-spec!`:
 
@@ -117,7 +117,7 @@ You can specify a clojure.spec for the ex-data via the multimethod at
 (ex/set-ex-data-spec! ::foo (s/keys :req [...] :opt [...]}))]}))`
 ```
 
-By default this is enforced via clojure.spec/assert, meaning unless
+By default this is enforced via `clojure.spec/assert`, meaning unless
 you toggled it "on" explicitely, it will be off.
 
 You can change this behavior and set the validator to something else
@@ -171,8 +171,17 @@ TODO: add more, refine
 * If it's a rethrow or comes from another exception pass the original
   exception as `cause` (3rd arg of `ex-info`)
 
+* Have logging in mind when you create them. It's easier to pull
+  predefined set of values from ELK or aggregate than searching on a
+  string message.
+
 * `ex-info`s should contain enough info but not too much (don't dump a
-  system/env map on its data)
+  system/env map on its ex-data).
+
+* Preferably select the data you want to show in your ex-data instead
+  of removing what you want to hide. If for some reason secrets end up
+  in the upstream data source at least there's is no risk of leaking
+  them with the exception that way.
 
 * If you use more than once the same `:type` you might want to spec it
 
@@ -180,22 +189,18 @@ TODO: add more, refine
   formated ex-infos
   `(d/error-deferred ::foo) vs (d/error-deferred (ex-info ".." {...}))`
 
-* Have logging in mind when you create them. It's easier to pull
-  predefined set of values from ELK or aggregate than searching on a
-  string message.
-
 * Do not leak data that is meant to emutate a usage context
   (cloudstack error codes, http status codes). That should be handled
   by a middleware at the edges.
-
-* TODO
 
 ## Usages examples
 
 Some real life examples of usage for this:
 
 * Deny all display of user exceptions to the end-user by default via
-  top level middleware and only mark the ones safe to show as
-  ::user-exposable in a declarative way.
+  top level middleware and only let through the ones marked safe to
+  show via a derived :type.
 
 * skip sentry logging for some kind of exceptions (or the inverse)
+
+*
