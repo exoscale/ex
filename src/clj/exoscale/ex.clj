@@ -122,3 +122,11 @@
                         ;; have no match
                         (try (throw ~ex-sym)
                              ~@clauses)))))))))
+
+;; Helpers for common exceptions
+;; =============================
+
+(defn incorrect-spec
+  [spec x]
+  (let [msg (s/explain-str spec x)]
+    (ex-info msg {:type ::incorrect :message msg})))
