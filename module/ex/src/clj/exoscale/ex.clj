@@ -92,7 +92,7 @@
 
   You can specify normal catch clauses for regular java errors and/or
   finally these are left untouched."
-  {:style/indent 2}
+  {:style/indent 0}
   [& xs]
   (let [[body mixed-clauses]
         (split-with (complement (some-fn catch-clause? catch-data-clause?))
