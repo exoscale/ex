@@ -1,4 +1,4 @@
-(load-file "../../setup.clj")
+(load-file "../../.setup.clj")
 (defproject exoscale/ex (:project/version properties)
   :description "Yet another exception catching library"
   :dependencies [[org.clojure/clojure "1.10.1"]]

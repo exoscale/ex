@@ -1,4 +1,4 @@
-(load-file "../../setup.clj")
+(load-file "../../.setup.clj")
 (defproject exoscale/ex-manifold (:project/version properties)
   :profiles {:dev {:dependencies [[exoscale/ex ~(:project/version properties)]
                                   [manifold "0.1.8"]]}}
