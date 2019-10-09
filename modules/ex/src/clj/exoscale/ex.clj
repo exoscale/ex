@@ -140,20 +140,32 @@
   #{::unavailable ::interrupted ::incorrect ::forbidden ::unsupported
     ::not-found ::conflict ::fault ::busy})
 
+(s/def ::type qualified-keyword?)
+
+(s/fdef ex-info
+  :args (s/cat :msg string?
+               :type+deriving (s/or :type ::type
+                                    :type+deriving (s/cat :type ::type
+                                                          :deriving (s/? (s/coll-of ::type))))
+               :data (s/? map?)
+               :cause (s/? #(instance? Throwable %))))
 (defn ex-info
   "Like `clojure.core/ex-info` but adds validation of the ex-data,
   automatic setting of the data `:type` from argument and potential
   derivation from `derived` argument"
   ([msg type]
-   (ex-info msg type {}))
+   (ex-info msg type nil))
   ([msg type data]
    (ex-info msg type data nil))
-  ([msg type data deriving]
-   (ex-info msg type data deriving nil))
-  ([msg type data deriving cause]
-   (let [data' (assoc data :type type)]
+  ([msg type data cause]
+   (let [coll-type? (coll? type)
+         type' (cond-> type
+                 coll-type?
+                 first)
+         deriving (when coll-type? (second type))
+         data' (assoc data :type type')]
      (assert-ex-data-valid data')
-     (run! #(derive type %) deriving)
+     (run! #(derive type' %) deriving)
      (clojure.core/ex-info msg
                            data'
                            cause))))

@@ -160,7 +160,8 @@ Within the namespace `:exoscale.ex`:
 This is very much inspired by
 [cognitect-labs/anomalies](https://github.com/cognitect-labs/anomalies).
 
-TODO: add more, refine
+We have simple wrappers to create exceptions base on these in
+`exoscale.ex.exception`, ex: `(exoscale.ex.exception/unavailable ...)`
 
 ## How to generate/use good ex-infos
 
@@ -192,6 +193,27 @@ TODO: add more, refine
 * Do not leak data that is meant to emutate a usage context
   (cloudstack error codes, http status codes). That should be handled
   by a middleware at the edges.
+
+## Helpers
+
+We have a few helpers, one worth mentioning would be
+`exoscale.ex/ex-info`.
+
+```clj
+;; shortest, just a msg and {:type ::incorrect}
+(ex/ex-info "Oh no" ::incorrect)
+
+;; same with some ex-data
+(ex/ex-info "Oh no" ::incorrect {:foo :bar})
+
+;; same with cause
+(ex/ex-info "Oh no" ::my-error {:foo :bar} cause)
+
+;; including derivation
+(ex/ex-info "Oh no" [::foo [::incorrect ::sentry-loggable]])
+
+(ex/ex-info "Oh no" [::foo [::incorrect ::sentry-loggable]] {...})
+```
 
 ## Usages examples
 
