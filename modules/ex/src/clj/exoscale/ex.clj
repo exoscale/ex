@@ -1,4 +1,5 @@
 (ns exoscale.ex
+  (:refer-clojure :exclude [ex-info])
   (:require [clojure.spec.alpha :as s])
   (:refer-clojure :exclude [derive underive ancestors descendants isa? parents
                             set-validator!]))
@@ -138,3 +139,21 @@
 (def types
   #{::unavailable ::interrupted ::incorrect ::forbidden ::unsupported
     ::not-found ::conflict ::fault ::busy})
+
+(defn ex-info
+  "Like `clojure.core/ex-info` but adds validation of the ex-data,
+  automatic setting of the data `:type` from argument and potential
+  derivation from `derived` argument"
+  ([msg type]
+   (ex-info msg type {}))
+  ([msg type data]
+   (ex-info msg type data nil))
+  ([msg type data deriving]
+   (ex-info msg type data deriving nil))
+  ([msg type data deriving cause]
+   (let [data' (assoc data :type type)]
+     (assert-ex-data-valid data')
+     (run! #(derive type %) deriving)
+     (clojure.core/ex-info msg
+                           data'
+                           cause))))
