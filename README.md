@@ -219,8 +219,12 @@ We have a few helpers
 
 * `exoscale.ex.exception/unavailable`,`exoscale.ex.exception/interrupted`, etc
 
-They are just shortcuts to `ex-info` with preset :type matching our
-base type table and built in validation.
+    They are just shortcuts to `ex-info` with preset :type matching our
+    base type table and built in validation.
+
+    ```clj
+    (throw (ex/unavailable "Cannot reach foo" {:because :this}))
+    ```
 
 ## Usages examples
 
