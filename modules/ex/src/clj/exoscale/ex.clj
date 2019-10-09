@@ -134,3 +134,7 @@
                         ;; have no match
                         (try (throw ~ex-sym)
                              ~@clauses)))))))))
+
+(def types
+  #{::unavailable ::interrupted ::incorrect ::forbidden ::unsupported
+    ::not-found ::conflict ::fault ::busy})
