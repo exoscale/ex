@@ -196,24 +196,31 @@ We have simple wrappers to create exceptions base on these in
 
 ## Helpers
 
-We have a few helpers, one worth mentioning would be
-`exoscale.ex/ex-info`.
+We have a few helpers
 
-```clj
-;; shortest, just a msg and {:type ::incorrect}
-(ex/ex-info "Oh no" ::incorrect)
 
-;; same with some ex-data
-(ex/ex-info "Oh no" ::incorrect {:foo :bar})
+* `exoscale.ex/ex-info`.
 
-;; same with cause
-(ex/ex-info "Oh no" ::my-error {:foo :bar} cause)
+    ```clj
+    ;; shortest, just a msg and {:type ::incorrect}
+    (ex/ex-info "Oh no" ::incorrect)
 
-;; including derivation
-(ex/ex-info "Oh no" [::foo [::incorrect ::sentry-loggable]])
+    ;; same with some ex-data
+    (ex/ex-info "Oh no" ::incorrect {:foo :bar})
 
-(ex/ex-info "Oh no" [::foo [::incorrect ::sentry-loggable]] {...})
-```
+    ;; same with cause
+    (ex/ex-info "Oh no" ::my-error {:foo :bar} cause)
+
+    ;; including derivation
+    (ex/ex-info "Oh no" [::foo [::incorrect ::sentry-loggable]])
+
+    (ex/ex-info "Oh no" [::foo [::incorrect ::sentry-loggable]] {...})
+    ```
+
+* `exoscale.ex.exception/unavailable`,`exoscale.ex.exception/interrupted`, etc
+
+They are just shortcuts to `ex-info` with preset :type matching our
+base type table and built in validation.
 
 ## Usages examples
 
