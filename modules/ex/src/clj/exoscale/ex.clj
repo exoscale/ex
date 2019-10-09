@@ -68,6 +68,18 @@
   [d ex]
   (vary-meta d assoc ::exception ex))
 
+(defn catch-data*
+  "catch-data as a function, takes an exception, tries to match it
+  against `type-key` from its ex-data.type, on match returns call to
+  `handler` with the ex-data, otherwise `continue` with the original
+  exception."
+  [e type-key handler continue]
+  (let [d (ex-data e)]
+    (assert-ex-data-valid d)
+    (if (isa? (:type d) type-key)
+      (handler (data+ex d e))
+      (continue e))))
+
 (defmacro try+
   "Like try but with support for ex-info/ex-data.
 

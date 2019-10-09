@@ -12,11 +12,6 @@
               (m/catch-data ::bar1
                 (fn [d] ::boom)))))
 
-  (is (= ::boom
-         @(-> (d/error-deferred (ex-info "bar" {:type ::bar1 :bar :baz}))
-              (m/catch-data* ::bar1 d
-                ::boom))))
-
   (ex/derive ::bar1 ::baz1)
   (is (= ::boom
          @(-> (d/error-deferred (ex-info "bar" {:type ::bar1 :bar :baz}))

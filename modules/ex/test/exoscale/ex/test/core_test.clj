@@ -11,7 +11,7 @@
      (catch Exception e#
        e#)))
 
-(deftest test-foo
+(deftest test-catch-data
   (let [d {:type ::foo}]
     (is (= d
            (ex/try+
@@ -39,6 +39,22 @@
                       (throw (Exception. "boom"))
                       (catch-data ::foo x
                                   x)))))))
+
+(deftest test-catch-data*
+  (let [d {:type ::foo}]
+    (is (= d
+           (ex/catch-data* (ex-info "asdf" d) ::foo
+                        identity
+                        (fn [] ::err))))
+
+    ;; no match
+    (is (= {:type ::asdf}
+           (ex-data (ex/catch-data* (ex-info "asdf" {:type ::asdf}) ::foo
+                                    (constantly false)
+                                    identity))))
+    (is (instance? Exception
+                   (ex/catch-data* (Exception. "boom") ::foo #(throw %)
+                                   identity)))))
 
 (deftest test-inheritance
   (ex/derive ::bar ::foo)
