@@ -223,7 +223,7 @@ We have a few helpers
     base type table and built in validation.
 
     ```clj
-    (throw (ex/unavailable "Cannot reach foo" {:because :this}))
+    (throw (ex.exception/unavailable "Cannot reach foo" {:because :this}))
     ```
 
 ## Usages examples
