@@ -152,7 +152,8 @@
 (defn ex-info
   "Like `clojure.core/ex-info` but adds validation of the ex-data,
   automatic setting of the data `:type` from argument and potential
-  derivation from `derived` argument"
+  derivation. You can specify type as either a keyword or a tuple of
+  `[<type> [<derivation>+]]`."
   ([msg type]
    (ex-info msg type nil))
   ([msg type data]
