@@ -1,5 +1,4 @@
 (ns exoscale.ex.exception
-  (:refer-clojure :exclude [ex-info])
   (:require [exoscale.ex :as ex]))
 
 (defmacro gen-ex-fn-for-type
