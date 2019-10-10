@@ -66,7 +66,7 @@
 (def ^:no-doc catch-data-clause? (find-clause-fn #{'catch-data}))
 (defn ^:no-doc data+ex
   [d ex]
-  (vary-meta d assoc ::exception ex))
+  (vary-meta d assoc ::exception ex ::message (ex-message ex)))
 
 (defn catch-data*
   "catch-data as a function, takes an exception, tries to match it
