@@ -12,7 +12,7 @@
         (~sym msg# data# nil))
        ([msg# data# cause#]
         (let [data# (assoc data# :type ~type)]
-          (ex/assert-ex-data-valid :exoscale.ex/ex-data data#)
+          (ex/assert-ex-data-valid data#)
           (ex-info msg# data# cause#))))))
 
 (defmacro gen-base-types
