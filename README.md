@@ -167,7 +167,8 @@ We have simple wrappers to create exceptions base on these in
 
 * Specify a `:type` key **always**
 
-* The type key should either be one of our base type or a descendant
+* The type key should either be one of our base type or a descendent.
+  Descendents should be avoided when possible.
 
 * If it's a rethrow or comes from another exception pass the original
   exception as `cause` (3rd arg of `ex-info`)
@@ -190,9 +191,9 @@ We have simple wrappers to create exceptions base on these in
   formated ex-infos
   `(d/error-deferred ::foo) vs (d/error-deferred (ex-info ".." {...}))`
 
-* Do not leak data that is meant to emutate a usage context
+* Do not leak data that is meant to emulate a usage context
   (cloudstack error codes, http status codes). That should be handled
-  by a middleware at the edges.
+  by a middleware at the edge.
 
 ## Helpers
 
@@ -226,7 +227,7 @@ We have a few helpers
     (throw (ex.exception/unavailable "Cannot reach foo" {:because :this}))
     ```
 
-## Usages examples
+## Usage examples
 
 Some real life examples of usage for this:
 
@@ -234,9 +235,7 @@ Some real life examples of usage for this:
   top level middleware and only let through the ones marked safe to
   show via a derived :type.
 
-* skip sentry logging for some kind of exceptions (or the inverse)
-
-*
+* Skip sentry logging for some kind of exceptions (or the inverse)
 
 
 ## Installation

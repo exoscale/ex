@@ -22,3 +22,10 @@
             ex/types)))
 
 (gen-base-types)
+
+(defn invalid-spec
+  "Returns an ex-info when value `x` does not conform to spec `spex`"
+  [spex x]
+  (exoscale.ex/ex-info (s/explain-str spec x)
+                       [::invalid-spec [:exoscale.ex/incorrect]]
+                       {:explain-data (s/explain-data spec x))))
