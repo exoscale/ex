@@ -237,3 +237,12 @@ Some real life examples of usage for this:
 * skip sentry logging for some kind of exceptions (or the inverse)
 
 *
+
+
+## Installation
+
+[![Clojars Project](https://img.shields.io/clojars/v/exoscale/ex.svg)](https://clojars.org/exoscale/ex)
+
+[![Clojars Project](https://img.shields.io/clojars/v/exoscale/ex-manifold.svg)](https://clojars.org/exoscale/ex-manifold)
+
+[![Clojars Project](https://img.shields.io/clojars/v/exoscale/ex-auspex.svg)](https://clojars.org/exoscale/ex-auspex)
