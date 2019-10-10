@@ -1,8 +1,7 @@
 (ns exoscale.ex
-  (:refer-clojure :exclude [ex-info])
-  (:require [clojure.spec.alpha :as s])
-  (:refer-clojure :exclude [derive underive ancestors descendants isa? parents
-                            set-validator!]))
+  (:refer-clojure :exclude [ex-info derive underive ancestors descendants
+                            parents isa? set-validator!])
+  (:require [clojure.spec.alpha :as s]))
 
 (defonce hierarchy (atom (make-hierarchy)))
 
