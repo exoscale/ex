@@ -7,6 +7,7 @@
                    "modules/ex-auspex"]
             :inherited {:source-paths ["src/clj"]
                         :url "https://github.com/exoscale/ex"
+                        :license {:name "ISC"}
                         :pedantic? :warn}
             :versions {org.clojure/clojure "1.10.1"}
             :monkeypatch-clojure-test false
