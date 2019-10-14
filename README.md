@@ -240,9 +240,11 @@ Some real life examples of usage for this:
 
 ## Api docs
 
-[![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex)](https://cljdoc.xyz/d/exoscale/ex/CURRENT)
-[![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-manifold)](https://cljdoc.xyz/d/exoscale/ex-manifold/CURRENT)
-[![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-auspex)](https://cljdoc.xyz/d/exoscale/ex-auspex/CURRENT)
+* ex: [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex)](https://cljdoc.xyz/d/exoscale/ex/CURRENT)
+
+* ex-manifold [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-manifold)](https://cljdoc.xyz/d/exoscale/ex-manifold/CURRENT)
+
+* ex-auxpex (completable future) [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-auspex)](https://cljdoc.xyz/d/exoscale/ex-auspex/CURRENT)
 
 ## Installation
 
