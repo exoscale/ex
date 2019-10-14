@@ -2,11 +2,11 @@
   (:require [exoscale.ex :as ex]
             [clojure.spec.alpha :as s]))
 
-(defmacro gen-ex-fn-for-type
+(defmacro ^:no-doc gen-ex-fn-for-type
   [type]
   (let [sym (symbol (name type))]
     `(defn ~sym
-       ~(format (str "Returns an ex-info with ex-data `:type` set to %s. Rest of"
+       ~(format (str "Returns an ex-info with ex-data `:type` set to %s. Rest of "
                      "the arguments match `ex-info`")
                 type)
        ([msg# data#]
@@ -16,7 +16,7 @@
           (ex/assert-ex-data-valid data#)
           (ex-info msg# data# cause#))))))
 
-(defmacro gen-base-types
+(defmacro ^:no-doc gen-base-types
   []
   `(do
      ~@(map (fn [t] `(gen-ex-fn-for-type ~t))

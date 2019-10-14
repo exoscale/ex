@@ -238,6 +238,12 @@ Some real life examples of usage for this:
 * Skip sentry logging for some kind of exceptions (or the inverse)
 
 
+## Api docs
+
+[![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex)](https://cljdoc.xyz/d/exoscale/ex/CURRENT)
+[![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-manifold)](https://cljdoc.xyz/d/exoscale/ex-manifold/CURRENT)
+[![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-auspex)](https://cljdoc.xyz/d/exoscale/ex-auspex/CURRENT)
+
 ## Installation
 
 [![Clojars Project](https://img.shields.io/clojars/v/exoscale/ex.svg)](https://clojars.org/exoscale/ex)
