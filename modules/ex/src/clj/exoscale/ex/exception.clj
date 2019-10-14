@@ -28,5 +28,5 @@
   "Returns an ex-info when value `x` does not conform to spec `spex`"
   [spec x]
   (exoscale.ex/ex-info (s/explain-str spec x)
-                       [:exoscale.ex/invalid-spec [:exoscale.ex/incorrect]]
+                       [::invalid-spec [::incorrect]]
                        {:explain-data (s/explain-data spec x)}))

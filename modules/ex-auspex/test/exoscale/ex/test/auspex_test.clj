@@ -3,7 +3,10 @@
   (:require
    [exoscale.ex :as ex]
    [exoscale.ex.auspex :as c]
-   [qbits.auspex :as a]))
+   [qbits.auspex :as a]
+   [clojure.spec.test.alpha]))
+
+(clojure.spec.test.alpha/instrument)
 
 (deftest test-auspex
   (let [ex (ex-info "bar" {:type ::bar1 :bar :baz})]

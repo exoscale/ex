@@ -1,0 +1,1 @@
+{:known-macros [clojure.spec.alpha/fdef]}

@@ -1,47 +1,70 @@
 (ns exoscale.ex
   (:refer-clojure :exclude [ex-info derive underive ancestors descendants
                             parents isa? set-validator!])
-  (:require [clojure.spec.alpha :as s]))
+  (:require [clojure.spec.alpha :as s]
+            [clojure.core.specs.alpha :as cs]
+            [clojure.string :as str]))
 
 (defonce hierarchy (atom (make-hierarchy)))
 
+(s/fdef derive
+        :args (s/cat :tag ::type
+                     :parent ::type))
 (defn derive
   "Like clojure.core/derive but scoped on our ex-info type hierarchy"
   [tag parent]
   (swap! hierarchy
          clojure.core/derive tag parent))
 
+(s/fdef underive
+        :args (s/cat :tag ::type
+                     :parent ::type))
 (defn underive
   "Like clojure.core/underive but scoped on our ex-info type hierarchy"
   [tag parent]
   (swap! hierarchy
          clojure.core/underive tag parent))
 
+(s/fdef ancestors
+        :args (s/cat :tag ::type))
 (defn ancestors
   "Like clojure.core/ancestors but scoped on our ex-info type hierarchy"
   [tag]
   (clojure.core/ancestors @hierarchy tag))
 
+(s/fdef descendants
+        :args (s/cat :tag ::type))
 (defn descendants
   "Like clojure.core/descendants but scoped on our ex-info type hierarchy"
   [tag]
   (clojure.core/descendants @hierarchy tag))
 
+(s/fdef parents
+        :args (s/cat :tag ::type))
 (defn parents
   "Like clojure.core/parents but scoped on our ex-info type hierarchy"
   [tag]
   (clojure.core/parents @hierarchy tag))
 
+(s/fdef isa?
+  :args (s/cat :child ::type
+               :parent ::type))
 (defn isa?
   "Like clojure.core/isa? but scoped on our ex-info type hierarchy"
   [child parent]
   (clojure.core/isa? @hierarchy child parent))
 
 (defmulti ex-data-spec :type)
-(s/def ::type qualified-keyword?)
-(s/def ::ex-data (s/multi-spec ex-data-spec :type))
 (defmethod ex-data-spec :default [_] (s/keys :opt-un [::type]))
 
+(s/def ::type qualified-keyword?)
+(s/def ::ex-data (s/multi-spec ex-data-spec :type))
+(s/def ::exception #(instance? Exception %))
+
+(s/fdef set-ex-data-spec!
+  :args (s/cat :type ::type
+               :spec (s/or :kw qualified-keyword?
+                           :spec-obj s/spec?)))
 (defn set-ex-data-spec!
   [type spec]
   (defmethod ex-data-spec type [_] spec))
@@ -68,6 +91,11 @@
   [d ex]
   (vary-meta d assoc ::exception ex ::message (ex-message ex)))
 
+(s/fdef catch-data*
+  :args (s/cat :exception ::exception
+               :type-key ::type
+               :handler ifn?
+               :continue ifn?))
 (defn catch-data*
   "catch-data as a function, takes an exception, tries to match it
   against `type-key` from its ex-data.type, on match returns call to
@@ -75,11 +103,40 @@
   exception."
   [e type-key handler continue]
   (let [d (ex-data e)]
-    (assert-ex-data-valid d)
-    (if (isa? (:type d) type-key)
-      (handler (data+ex d e))
+    (if (and d (isa? (:type d) type-key))
+      (do (assert-ex-data-valid d)
+          (handler (data+ex d e)))
       (continue e))))
 
+(s/def ::try$catch
+  (s/cat :clause #{'catch}
+         :class symbol?
+         :binding symbol?
+         :body (s/* any?)))
+
+(s/def ::try$catch-data
+  (s/cat :clause #{'catch-data}
+         :type ::type
+         :binding ::cs/binding-form
+         :body (s/* any?)))
+
+(s/def ::try$finally
+  (s/cat :clause #{'finally}
+         :body (s/* any?)))
+
+(s/def ::try$body
+  (s/+ #(not (and (coll? %)
+                  (#{'catch 'catch-data 'finally}
+                   (first %))))))
+
+(s/fdef try+
+  :args (s/cat
+          :body ::try$body
+          :clauses (s/+
+                    (s/or
+                     :catch ::try$catch
+                     :catch-data ::try$catch-data
+                     :finally ::try$finally))))
 (defmacro try+
   "Like try but with support for ex-info/ex-data.
 
@@ -139,15 +196,13 @@
   #{::unavailable ::interrupted ::incorrect ::forbidden ::unsupported
     ::not-found ::conflict ::fault ::busy})
 
-(s/def ::type qualified-keyword?)
-
 (s/fdef ex-info
   :args (s/cat :msg string?
                :type+deriving (s/or :type ::type
                                     :type+deriving (s/cat :type ::type
                                                           :deriving (s/? (s/coll-of ::type))))
-               :data (s/? map?)
-               :cause (s/? #(instance? Throwable %))))
+               :data (s/? (s/nilable ::ex-data))
+               :cause (s/? (s/nilable ::exception))))
 (defn ex-info
   "Like `clojure.core/ex-info` but adds validation of the ex-data,
   automatic setting of the data `:type` from argument and potential
@@ -169,3 +224,37 @@
      (clojure.core/ex-info msg
                            data'
                            cause))))
+
+;;; Sugar for common exceptions
+
+(defmacro ^:no-doc gen-ex-fn-for-type
+  [type]
+  (let [sym (symbol (str "ex-" (name type)))
+        msg 'msg
+        data 'data
+        cause 'cause]
+    `(do
+       (s/fdef ~sym
+         :args (s/cat :msg (s/and string? (complement str/blank?))
+                      :data (s/? (s/nilable ::ex-data))
+                      :cause (s/? (s/nilable ::exception))))
+       (defn ~sym
+        ~(format (str "Returns an ex-info with ex-data `:type` set to %s. Rest of "
+                      "the arguments match `ex-info`")
+                 type)
+        ([~msg ~data]
+         (~sym ~msg ~data nil))
+        ([~msg ~data ~cause]
+         (let [~data (assoc ~data :type ~type)]
+           (ex-info ~msg ~type ~data ~cause)))))))
+(run! (fn [t] (eval `(gen-ex-fn-for-type ~t))) types)
+
+(s/fdef invalid-spec
+  :args (s/cat :spec qualified-keyword?
+               :x any?))
+(defn invalid-spec
+  "Returns an ex-info when value `x` does not conform to spec `spex`"
+  [spec x]
+  (exoscale.ex/ex-info (s/explain-str spec x)
+                       [::invalid-spec [::incorrect]]
+                       {:explain-data (s/explain-data spec x)}))
