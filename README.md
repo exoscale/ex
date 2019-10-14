@@ -245,7 +245,7 @@ Some real life examples of usage for this:
 
 * [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-manifold)](https://cljdoc.xyz/d/exoscale/ex-manifold/CURRENT) ex-manifold
 
-* [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-auspex)](https://cljdoc.xyz/d/exoscale/ex-auspex/CURRENT) ex-auxpex (completable future)
+* [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-auspex)](https://cljdoc.xyz/d/exoscale/ex-auspex/CURRENT) ex-auspex (completable future)
 
 ## Installation
 
