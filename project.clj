@@ -1,4 +1,4 @@
-(defproject ex-parent "0.1.5"
+(defproject ex-parent "0.1.6-SNAPSHOT"
 
   :plugins [[lein-modules "0.3.11"]]
 
