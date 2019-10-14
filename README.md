@@ -16,7 +16,8 @@ without having to define/extend classes.
 
 * We don't want to differ from the original `try`/`catch`/`finally` semantics.
 
-* We want to have the same mechanism for `manifold.deferred/catch`.
+* We want to have the same mechanism for `manifold.deferred/catch`,
+  `CompletableFuture`.
 
 * We want to minimize any performance penalty it might have.
 
@@ -240,11 +241,11 @@ Some real life examples of usage for this:
 
 ## Api docs
 
-* ex: [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex)](https://cljdoc.xyz/d/exoscale/ex/CURRENT)
+* [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex)](https://cljdoc.xyz/d/exoscale/ex/CURRENT) ex
 
-* ex-manifold [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-manifold)](https://cljdoc.xyz/d/exoscale/ex-manifold/CURRENT)
+* [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-manifold)](https://cljdoc.xyz/d/exoscale/ex-manifold/CURRENT) ex-manifold
 
-* ex-auxpex (completable future) [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-auspex)](https://cljdoc.xyz/d/exoscale/ex-auspex/CURRENT)
+* [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-auspex)](https://cljdoc.xyz/d/exoscale/ex-auspex/CURRENT) ex-auxpex (completable future)
 
 ## Installation
 
