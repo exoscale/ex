@@ -54,7 +54,7 @@
   [child parent]
   (clojure.core/isa? @hierarchy child parent))
 
-(defmulti ex-data-spec :type)
+(defmulti ^:no-doc ex-data-spec :type)
 (defmethod ex-data-spec :default [_] (s/keys :opt-un [::type]))
 
 (s/def ::type qualified-keyword?)
