@@ -2,7 +2,6 @@
   (:use clojure.test)
   (:require
    [exoscale.ex :as ex]
-   [exoscale.ex.exception :as exc]
    [clojure.spec.alpha :as s]
    [clojure.spec.test.alpha]))
 

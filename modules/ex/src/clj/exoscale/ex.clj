@@ -249,10 +249,10 @@
            (ex-info ~msg ~type ~data ~cause)))))))
 (run! (fn [t] (eval `(gen-ex-fn-for-type ~t))) types)
 
-(s/fdef invalid-spec
+(s/fdef ex-invalid-spec
   :args (s/cat :spec qualified-keyword?
                :x any?))
-(defn invalid-spec
+(defn ex-invalid-spec
   "Returns an ex-info when value `x` does not conform to spec `spex`"
   [spec x]
   (exoscale.ex/ex-info (s/explain-str spec x)
