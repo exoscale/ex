@@ -1,4 +1,4 @@
-(defproject exoscale/ex "0.1.6"
+(defproject exoscale/ex "0.2.0-SNAPSHOT"
   :dependencies [[org.clojure/clojure ]]
   :plugins [[lein-modules "0.3.11"]]
   :modules {:parent "../../"})
