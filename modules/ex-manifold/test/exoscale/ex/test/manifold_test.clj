@@ -3,8 +3,10 @@
   (:require
    [exoscale.ex :as ex]
    [exoscale.ex.manifold :as m]
-
+   [clojure.spec.test.alpha]
    [manifold.deferred :as d]))
+
+(clojure.spec.test.alpha/instrument)
 
 (deftest test-manifold
   (is (= ::boom

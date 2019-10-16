@@ -219,13 +219,13 @@ We have a few helpers
     (ex/ex-info "Oh no" [::foo [::incorrect ::sentry-loggable]] {...})
     ```
 
-* `exoscale.ex.exception/unavailable`,`exoscale.ex.exception/interrupted`, etc
+* `ex/ex-unavailable`,`ex/ex-interrupted`, etc
 
     They are just shortcuts to `ex-info` with preset :type matching our
     base type table and built in validation.
 
     ```clj
-    (throw (ex.exception/unavailable "Cannot reach foo" {:because :this}))
+    (throw (ex/ex-unavailable "Cannot reach foo" {:because :this}))
     ```
 
 ## Usage examples
