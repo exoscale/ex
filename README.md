@@ -21,8 +21,8 @@ without having to define/extend classes.
 
 * We want to minimize any performance penalty it might have.
 
-* We don't want to emit `catch Throwable` (it's bad), stay as close as
-  possible to what the user would write by hand.
+* We don't want to emit `catch Throwable`, stay as close as possible
+  to what the user would write by hand.
 
 ## How
 
