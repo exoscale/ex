@@ -130,13 +130,12 @@
                    (first %))))))
 
 (s/fdef try+
-  :args (s/cat
-         :body ::try$body
-         :clauses (s/+
-                   (s/or
-                    :catch ::try$catch
-                    :catch-data ::try$catch-data
-                    :finally ::try$finally))))
+  :args (s/cat :body ::try$body
+               :clauses (s/+
+                         (s/or
+                          :catch ::try$catch
+                          :catch-data ::try$catch-data
+                          :finally ::try$finally))))
 (defmacro try+
   "Like try but with support for ex-info/ex-data.
 
