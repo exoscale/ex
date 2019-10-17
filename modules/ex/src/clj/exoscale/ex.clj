@@ -87,9 +87,13 @@
 
 (defn ^:no-doc catch-data-symbol?
   "It can be catch-data or *ns*/catch-data depending on how it's
-  called/expanded (macros|eval|runtime)"
+  called/expanded (macros|eval|runtime) and if it's resolvable we must
+  ignore it (ex: (try+ (exoscale.ex.manifold/catch-data ...))"
   [s]
-  (= "catch-data" (name s)))
+  (or (= s 'catch-data)
+      (and (= "catch-data" (name s))
+           (not (try (requiring-resolve s)
+                     (catch Exception e))))))
 
 (def ^:no-doc catch-clause-expr? (find-clause-fn #{'catch 'finally}))
 (def ^:no-doc catch-data-clause-expr? (find-clause-fn catch-data-symbol?))
