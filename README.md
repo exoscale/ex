@@ -161,8 +161,9 @@ Within the namespace `:exoscale.ex`:
 This is very much inspired by
 [cognitect-labs/anomalies](https://github.com/cognitect-labs/anomalies).
 
-We have simple wrappers to create exceptions base on these in
-`exoscale.ex.exception`, ex: `(exoscale.ex.exception/unavailable ...)`
+We have simple wrappers to create ex-info based on this:
+`ex/ex-unavailable`, `ex/ex-interrupted` and so on. Their signature is
+identical to `ex-info` otherwise.
 
 ## How to generate/use good ex-infos
 
