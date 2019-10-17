@@ -8,8 +8,8 @@
 (defonce hierarchy (atom (make-hierarchy)))
 
 (s/fdef derive
-        :args (s/cat :tag ::type
-                     :parent ::type))
+  :args (s/cat :tag ::type
+               :parent ::type))
 (defn derive
   "Like clojure.core/derive but scoped on our ex-info type hierarchy"
   [tag parent]
@@ -17,8 +17,8 @@
          clojure.core/derive tag parent))
 
 (s/fdef underive
-        :args (s/cat :tag ::type
-                     :parent ::type))
+  :args (s/cat :tag ::type
+               :parent ::type))
 (defn underive
   "Like clojure.core/underive but scoped on our ex-info type hierarchy"
   [tag parent]
@@ -26,21 +26,21 @@
          clojure.core/underive tag parent))
 
 (s/fdef ancestors
-        :args (s/cat :tag ::type))
+  :args (s/cat :tag ::type))
 (defn ancestors
   "Like clojure.core/ancestors but scoped on our ex-info type hierarchy"
   [tag]
   (clojure.core/ancestors @hierarchy tag))
 
 (s/fdef descendants
-        :args (s/cat :tag ::type))
+  :args (s/cat :tag ::type))
 (defn descendants
   "Like clojure.core/descendants but scoped on our ex-info type hierarchy"
   [tag]
   (clojure.core/descendants @hierarchy tag))
 
 (s/fdef parents
-        :args (s/cat :tag ::type))
+  :args (s/cat :tag ::type))
 (defn parents
   "Like clojure.core/parents but scoped on our ex-info type hierarchy"
   [tag]
@@ -131,12 +131,12 @@
 
 (s/fdef try+
   :args (s/cat
-          :body ::try$body
-          :clauses (s/+
-                    (s/or
-                     :catch ::try$catch
-                     :catch-data ::try$catch-data
-                     :finally ::try$finally))))
+         :body ::try$body
+         :clauses (s/+
+                   (s/or
+                    :catch ::try$catch
+                    :catch-data ::try$catch-data
+                    :finally ::try$finally))))
 (defmacro try+
   "Like try but with support for ex-info/ex-data.
 
@@ -239,14 +239,16 @@
                       :data (s/? (s/nilable ::ex-data))
                       :cause (s/? (s/nilable ::exception))))
        (defn ~sym
-        ~(format (str "Returns an ex-info with ex-data `:type` set to %s. Rest of "
-                      "the arguments match `ex-info`")
-                 type)
-        ([~msg ~data]
-         (~sym ~msg ~data nil))
-        ([~msg ~data ~cause]
-         (let [~data (assoc ~data :type ~type)]
-           (ex-info ~msg ~type ~data ~cause)))))))
+         ~(format (str "Returns an ex-info with ex-data `:type` set to %s. Rest of "
+                       "the arguments match `ex-info`")
+                  type)
+         ([~msg]
+          (~sym ~msg nil nil))
+         ([~msg ~data]
+          (~sym ~msg ~data nil))
+         ([~msg ~data ~cause]
+          (let [~data (assoc ~data :type ~type)]
+            (ex-info ~msg ~type ~data ~cause)))))))
 (run! (fn [t] (eval `(gen-ex-fn-for-type ~t))) types)
 
 (s/fdef ex-invalid-spec
