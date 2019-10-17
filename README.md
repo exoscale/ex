@@ -229,6 +229,13 @@ We have a few helpers
     (throw (ex/ex-unavailable "Cannot reach foo" {:because :this}))
     ```
 
+* for testing you can use in `exoscale.ex.test` `thrown-ex-info-type?` similar to `thrown?` in clojure.test.
+
+   ```clj
+   (is (thrown-ex-info-type? ::foo (throw (ex-info "boom" {:type ::foo})))) -> true
+   ```
+   It dispatches via `try+/catch-data`, so relations are supported.
+
 ## Usage examples
 
 Some real life examples of usage for this:

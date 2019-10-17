@@ -3,7 +3,7 @@
   (:require [clojure.test :as t]
             [exoscale.ex :as ex]))
 
-(defmethod t/assert-expr 'thrown-ex-data? [msg form]
+(defmethod t/assert-expr 'thrown-ex-info-type? [msg form]
   ;; (is (thrown-ex-data? c expr))
   ;; Asserts that evaluating expr throws an exceptioninfo of :type `k`.
   ;; Returns the exceptioninfo thrown.

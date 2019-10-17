@@ -108,4 +108,4 @@
                         (catch-data ::bar e# 1)))))))
 
 (deftest test-thrown-ex-data
-  (is (thrown-ex-data? ::foo (throw (ex/ex-info "bar" ::foo)))))
+  (is (thrown-ex-info-type? ::foo (throw (ex/ex-info "bar" ::foo)))))
