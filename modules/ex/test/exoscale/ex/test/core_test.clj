@@ -2,6 +2,7 @@
   (:use clojure.test)
   (:require
    [exoscale.ex :as ex]
+   [exoscale.ex.test :as t]
    [clojure.spec.alpha :as s]
    [clojure.spec.test.alpha]))
 
@@ -100,3 +101,11 @@
   (ex/set-ex-data-spec! ::a1 (s/keys :req [::foo]))
   (is (false? (s/valid? ::ex/ex-data {:type ::a1})))
   (is (true? (s/valid? ::ex/ex-data {:type ::a1 ::foo "bar"}))))
+
+(deftest test-within-eval
+  (is (= 1 (eval `(do (ex/try+
+                        (throw (ex-info "boom" {:type ::bar}))
+                        (catch-data ::bar e# 1)))))))
+
+(deftest test-thrown-ex-data
+  (is (thrown-ex-data? ::foo (throw (ex/ex-info "bar" ::foo)))))

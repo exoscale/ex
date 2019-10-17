@@ -85,8 +85,16 @@
     (and (seq? x)
          (pred (first x)))))
 
-(def ^:no-doc catch-clause? (find-clause-fn #{'catch 'finally}))
-(def ^:no-doc catch-data-clause? (find-clause-fn #{'catch-data}))
+(defn ^:no-doc catch-data-symbol?
+  "It can be catch-data or *ns*/catch-data depending on how it's
+  called/expanded (macros|eval|runtime)"
+  [s]
+  (= "catch-data" (name s)))
+
+(def ^:no-doc catch-clause-expr? (find-clause-fn #{'catch 'finally}))
+(def ^:no-doc catch-data-clause-expr? (find-clause-fn catch-data-symbol?))
+(def ^:no-doc try-sub-clause (some-fn catch-clause-expr? catch-data-clause-expr?))
+
 (defn ^:no-doc data+ex
   [d ex]
   (vary-meta d assoc ::exception ex ::message (ex-message ex)))
@@ -115,7 +123,7 @@
          :body (s/* any?)))
 
 (s/def ::try$catch-data
-  (s/cat :clause #{'catch-data}
+  (s/cat :clause catch-data-symbol?
          :type ::type
          :binding ::cs/binding-form
          :body (s/* any?)))
@@ -126,8 +134,7 @@
 
 (s/def ::try$body
   (s/+ #(not (and (coll? %)
-                  (#{'catch 'catch-data 'finally}
-                   (first %))))))
+                  (try-sub-clause (first %))))))
 
 (s/fdef try+
   :args (s/cat :body ::try$body
@@ -162,18 +169,16 @@
   finally these are left untouched."
   {:style/indent 0}
   [& xs]
-  (let [[body mixed-clauses]
-        (split-with (complement (some-fn catch-clause? catch-data-clause?))
-                    xs)
-        clauses (filter catch-clause? mixed-clauses)
-        ex-info-clauses (filter catch-data-clause? mixed-clauses)
+  (let [[body mixed-clauses] (split-with (complement try-sub-clause) xs)
+        clauses (filter catch-clause-expr? mixed-clauses)
+        catch-data-clauses (filter catch-data-clause-expr? mixed-clauses)
         type-sym (gensym "ex-type-")
         data-sym (gensym "ex-data-")
         ex-sym (gensym "ex")]
     `(try
        ~@body
        ~@(cond-> clauses
-           (seq ex-info-clauses)
+           (seq catch-data-clauses)
            (conj `(catch clojure.lang.ExceptionInfo ~ex-sym
                     (let [~data-sym (ex-data ~ex-sym)
                           ~type-sym (:type ~data-sym)]
@@ -184,7 +189,7 @@
                                         (assert-ex-data-valid ~data-sym)
                                         (let [~binding (data+ex ~data-sym ~ex-sym)]
                                           ~@body))])
-                                  ex-info-clauses)
+                                  catch-data-clauses)
                         :else
                         ;; rethrow ex-info with other clauses since we
                         ;; have no match
