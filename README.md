@@ -34,17 +34,17 @@ relations. It also comes with manifold support.
 So we have `exoscale.ex/try+`, which supports vanilla `catch`/`finally`
 clauses.
 
-If you specify a `catch-data` clause with a keyword as first argument
+If you specify a `catch` clause with a keyword as first argument
 things get interesting. **We assume you always put a `:type` key in
 the ex-infos you generate**, and will match its value to the value of
-the key in the `catch-data` clause.
+the key in the `catch` clause.
 
 ### The basics
 
-Essentially `catch-data` takes this form:
+Essentially `catch` takes this form:
 
 ```clj
-(catch-data :something m
+(catch :something m
    ;; where m is a binding to the ex-data (you can destructure at that level as well)
    )
 ```
@@ -59,10 +59,10 @@ So you can do things like that.
 
   (throw (ex-info "Argh" {:type ::bar :foo "a foo"}))
 
-  (catch-data ::foo data
+  (catch ::foo data
     (prn :got-ex-data data))
 
-  (catch-data ::bar {:as data :keys [foo]}
+  (catch ::bar {:as data :keys [foo]}
     ;; in that case it would hit this one
     (prn :got-ex-data-again foo))
 
@@ -88,7 +88,7 @@ classes directly.
 
 (ex/try+
   (throw (ex-info "I am a bar" {:type ::bar})
-  (catch-data ::foo d
+  (catch ::foo d
     (prn "got a foo with data" d)
     (prn "Original exception instance is " (-> d meta ::ex/exception))))
 
@@ -96,15 +96,15 @@ classes directly.
 
 ### Manifold support
 
-We have `exoscale.ex.manifold/catch-data` that matches the semantics
-of a `catch-data` block in `try+` but with a more manifold like feel.
+We have `exoscale.ex.manifold/catch` that matches the semantics
+of a `catch` block in `try+` but with a more manifold like feel.
 
 ```clj
 (require '[exoscale.ex.manifold :as mx])
 (require '[manifold.deferred :as d])
 
 (-> (d/error-deferred (ex-info "boom" {:type :bar}))
-    (mx/catch-data :bar (fn [data] (prn "ex-data is: " data)))
+    (mx/catch :bar (fn [data] (prn "ex-data is: " data)))
     (d/catch (fn [ex] "... regular manifold handling here")))
 ```
 
@@ -234,7 +234,7 @@ We have a few helpers
    ```clj
    (is (thrown-ex-info-type? ::foo (throw (ex-info "boom" {:type ::foo})))) -> true
    ```
-   It dispatches via `try+/catch-data`, so relations are supported.
+   It dispatches via `try+/catch`, so relations are supported.
 
 ## Usage examples
 

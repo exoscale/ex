@@ -12,22 +12,22 @@
   (let [ex (ex-info "bar" {:type ::bar1 :bar :baz})]
     (is (= ::boom
            @(-> (a/error-future ex)
-                (c/catch-data ::bar1
-                              (fn [d] ::boom)))))
+                (c/catch ::bar1
+                    (fn [d] ::boom)))))
 
     (ex/derive ::bar1 ::baz1)
     (is (= ::boom
            @(-> (a/error-future ex)
-                (c/catch-data ::baz1
-                              (fn [d] ::boom)))))
+                (c/catch ::baz1
+                    (fn [d] ::boom)))))
     (ex/underive ::bar1 ::baz1)
 
     (is (= ex
            @(-> (a/error-future ex)
-                (c/catch-data ::bak1
-                              (fn [d] ::boom))
+                (c/catch ::bak1
+                    (fn [d] ::boom))
                 (a/catch clojure.lang.ExceptionInfo (fn [e] e)))))
     (is (= :foo
            @(-> (a/success-future :foo)
-                (c/catch-data ::bak1
-                              (fn [d] ::boom)))))))
+                (c/catch ::bak1
+                    (fn [d] ::boom)))))))

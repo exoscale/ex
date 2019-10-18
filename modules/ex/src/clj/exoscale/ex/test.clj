@@ -15,12 +15,12 @@
                      :message ~msg
                      :expected '~form
                      :actual nil})
-       (catch-data ~k d#
-                   (t/do-report {:type :pass
-                                 :message ~msg,
-                                 :expected '~form
-                                 :actual d#})
-                   (::ex/exception d#))
+       (catch ~k d#
+         (t/do-report {:type :pass
+                       :message ~msg,
+                       :expected '~form
+                       :actual d#})
+         (::ex/exception d#))
        (catch Exception e#
          (t/do-report {:type :fail
                        :message ~msg

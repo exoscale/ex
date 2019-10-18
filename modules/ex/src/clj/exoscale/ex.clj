@@ -79,36 +79,41 @@
   [f]
   (alter-var-root #'assert-ex-data-valid (constantly f)))
 
-(defn ^:no-doc find-clause-fn
-  [pred]
-  (fn [x]
-    (and (seq? x)
-         (pred (first x)))))
+(def ^:no-doc catch-sym? #{'catch})
 
-(defn ^:no-doc catch-data-symbol?
-  "It can be catch-data or *ns*/catch-data depending on how it's
-  called/expanded (macros|eval|runtime) and if it's resolvable we must
-  ignore it (ex: (try+ (exoscale.ex.manifold/catch-data ...))"
-  [s]
-  (or (= s 'catch-data)
-      (and (= "catch-data" (name s))
-           (not (try (requiring-resolve s)
-                     (catch Exception e))))))
+(defn ^:no-doc catch-expr?
+  [expr]
+  (and (coll? expr)
+       (catch-sym? (first expr))))
 
-(def ^:no-doc catch-clause-expr? (find-clause-fn #{'catch 'finally}))
-(def ^:no-doc catch-data-clause-expr? (find-clause-fn catch-data-symbol?))
-(def ^:no-doc try-sub-clause (some-fn catch-clause-expr? catch-data-clause-expr?))
+(defn ^:no-doc catch-data-expr?
+  [expr]
+  (and (catch-expr? expr)
+       (qualified-keyword? (second expr))))
+
+(defn ^:no-doc catch-exception-expr?
+  [expr]
+  (and (catch-expr? expr)
+       (symbol? (second expr))))
+
+(defn ^:no-doc finally-expr?
+  [expr]
+  (and (coll? expr)
+       (= (first expr) 'finally)))
+
+(def ^:no-doc reg-expr? (some-fn finally-expr? catch-exception-expr?))
+(def ^:no-doc try-sub-clause (some-fn catch-exception-expr? catch-data-expr?))
 
 (defn ^:no-doc data+ex
   [d ex]
-  (vary-meta d assoc ::exception ex ::message (ex-message ex)))
+  (vary-meta d assoc ::exception ex))
 
-(s/fdef catch-data*
+(s/fdef catch*
   :args (s/cat :exception ::exception
                :type-key ::type
                :handler ifn?
                :continue ifn?))
-(defn catch-data*
+(defn catch
   "catch-data as a function, takes an exception, tries to match it
   against `type-key` from its ex-data.type, on match returns call to
   `handler` with the ex-data, otherwise `continue` with the original
@@ -120,14 +125,14 @@
           (handler (data+ex d e)))
       (continue e))))
 
-(s/def ::try$catch
-  (s/cat :clause #{'catch}
+(s/def ::try$catch-exception
+  (s/cat :clause catch-sym?
          :class symbol?
          :binding symbol?
          :body (s/* any?)))
 
 (s/def ::try$catch-data
-  (s/cat :clause catch-data-symbol?
+  (s/cat :clause catch-sym?
          :type ::type
          :binding ::cs/binding-form
          :body (s/* any?)))
@@ -144,7 +149,7 @@
   :args (s/cat :body ::try$body
                :clauses (s/+
                          (s/or
-                          :catch ::try$catch
+                          :catch-exception ::try$catch-exception
                           :catch-data ::try$catch-data
                           :finally ::try$finally))))
 (defmacro try+
@@ -159,9 +164,9 @@
 
   (try
     [...]
-    (catch-data ::something my-ex-data
+    (catch ::something my-ex-data
       (do-something my-ex-info))
-    (catch-data ::something-else {:as my-ex-data :keys [foo bar]}
+    (catch ::something-else {:as my-ex-data :keys [foo bar]}
       (do-something foo bar))
     (catch Exception e
       (do-something e))
@@ -174,14 +179,14 @@
   {:style/indent 0}
   [& xs]
   (let [[body mixed-clauses] (split-with (complement try-sub-clause) xs)
-        clauses (filter catch-clause-expr? mixed-clauses)
-        catch-data-clauses (filter catch-data-clause-expr? mixed-clauses)
+        regular-clauses (filter reg-expr? mixed-clauses)
+        catch-data-clauses (filter catch-data-expr? mixed-clauses)
         type-sym (gensym "ex-type-")
         data-sym (gensym "ex-data-")
-        ex-sym (gensym "ex")]
+        ex-sym '&ex]
     `(try
        ~@body
-       ~@(cond-> clauses
+       ~@(cond-> regular-clauses
            (seq catch-data-clauses)
            (conj `(catch clojure.lang.ExceptionInfo ~ex-sym
                     (let [~data-sym (ex-data ~ex-sym)
@@ -198,7 +203,7 @@
                         ;; rethrow ex-info with other clauses since we
                         ;; have no match
                         (try (throw ~ex-sym)
-                             ~@clauses)))))))))
+                             ~@regular-clauses)))))))))
 
 (def types
   #{::unavailable ::interrupted ::incorrect ::forbidden ::unsupported
