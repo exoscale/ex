@@ -140,6 +140,8 @@ of execution in production as this would only show up at "catch time".
 
 You can also get the full exception instance via the metadata on the
 ex-data we extract, it's under the `:exoscale.ex/exception` key.
+If you are within a `try+` block you can also access it directly via
+`&ex`
 
 ###  Our default internal `:type`s table
 
