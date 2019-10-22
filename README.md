@@ -2,6 +2,8 @@
 
 Exception handling library for clojure(+manifold)
 
+![ex](x.png)
+
 ## Rationale
 
 * We want to be able to express/handle exceptions via `ex-info` in a
