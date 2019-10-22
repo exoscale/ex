@@ -19,7 +19,7 @@ without having to define/extend classes.
 * We don't want to differ from the original `try`/`catch`/`finally` semantics.
 
 * We want to have the same mechanism for `manifold.deferred/catch`,
-  `CompletableFuture`.
+  `CompletableFuture`, optional via separate deps.
 
 * We want to minimize any performance penalty it might have.
 
