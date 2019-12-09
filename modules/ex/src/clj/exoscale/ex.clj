@@ -268,7 +268,8 @@
   :args (s/cat :spec qualified-keyword?
                :x any?
                :data (s/? (s/nilable ::ex-data))))
-(defn ex-invalid-spec
+
+(defn invalid-spec
   "Returns an ex-info when value `x` does not conform to spec `spex`"
   ([spec x]
    (ex-invalid-spec spec x nil))
@@ -276,3 +277,7 @@
    (exoscale.ex/ex-info (format "Invalid spec: %s" (s/explain-str spec x))
                         [::invalid-spec [::incorrect]]
                         (assoc data :explain-data (s/explain-data spec x)))))
+
+(def ex-invalid-spec
+  "See `invalid-spec`"
+  #'invalid-spec)
