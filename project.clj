@@ -1,6 +1,7 @@
 (defproject ex-parent "0.3.4-SNAPSHOT"
 
   :plugins [[lein-modules "0.3.11"]]
+  :deploy-repositories [["releases" :clojars] ["snapshots" :clojars]]
 
   :modules {:dirs ["modules/ex"
                    "modules/ex-manifold"
@@ -8,6 +9,7 @@
             :inherited {:source-paths ["src/clj"]
                         :url "https://github.com/exoscale/ex"
                         :license {:name "ISC"}
+                        :deploy-repositories [["releases" :clojars] ["snapshots" :clojars]]
                         :pedantic? :warn}
             :versions {org.clojure/clojure "1.10.1"}
             :monkeypatch-clojure-test false
