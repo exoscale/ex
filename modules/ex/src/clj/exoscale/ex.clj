@@ -283,4 +283,5 @@
    `ex-invalid-spec`"
   [spec x]
   (when-not (s/valid? spec x)
-    (throw (ex-invalid-spec spec x))))
+    (throw (ex-invalid-spec spec x)))
+  x)
