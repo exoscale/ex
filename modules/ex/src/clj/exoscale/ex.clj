@@ -108,6 +108,14 @@
   [d ex]
   (vary-meta d assoc ::exception ex))
 
+(s/fdef type?
+  :args (s/cat :x any?
+               :type ::type))
+(defn type?
+  "Returns true if `ex` is an ex-info with descendant/type of `type`"
+  [ex t]
+  (some-> ex meta :type (isa? t)))
+
 (s/fdef catch*
   :args (s/cat :exception ::exception
                :type-key ::type
@@ -120,7 +128,7 @@
   exception."
   [e type-key handler continue]
   (let [d (ex-data e)]
-    (if (and d (isa? (:type d) type-key))
+    (if (type? d type-key)
       (do (assert-ex-data-valid d)
           (handler (data+ex d e)))
       (continue e))))
