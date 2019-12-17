@@ -108,6 +108,14 @@
   [d ex]
   (vary-meta d assoc ::exception ex))
 
+(s/fdef type?
+  :args (s/cat :x any?
+               :type ::type))
+(defn type?
+  "Returns true if `ex` is an ex-info with descendant/type of `type`"
+  [ex t]
+  (some-> ex ex-data :type (isa? t)))
+
 (s/fdef catch*
   :args (s/cat :exception ::exception
                :type-key ::type
@@ -119,11 +127,11 @@
   `handler` with the ex-data, otherwise `continue` with the original
   exception."
   [e type-key handler continue]
-  (let [d (ex-data e)]
-    (if (and d (isa? (:type d) type-key))
-      (do (assert-ex-data-valid d)
-          (handler (data+ex d e)))
-      (continue e))))
+  (if (type? e type-key)
+    (let [d (ex-data e)]
+      (assert-ex-data-valid d)
+      (handler (data+ex d e)))
+    (continue e)))
 
 (s/def ::try$catch-exception
   (s/cat :clause catch-sym?
@@ -268,7 +276,6 @@
   :args (s/cat :spec qualified-keyword?
                :x any?
                :data (s/? (s/nilable ::ex-data))))
-
 (defn ex-invalid-spec
   "Returns an ex-info when value `x` does not conform to spec `spex`"
   ([spec x]
@@ -278,10 +285,16 @@
                         [::invalid-spec [::incorrect]]
                         (assoc data :explain-data (s/explain-data spec x)))))
 
+(s/fdef ex-invalid-spec
+  :args (s/cat :spec qualified-keyword?
+               :x any?
+               :data (s/? (s/nilable ::ex-data))))
 (defn assert-spec-valid
   "Asserts that `x` conforms to `spec`, otherwise throws with
    `ex-invalid-spec`"
-  [spec x]
-  (when-not (s/valid? spec x)
-    (throw (ex-invalid-spec spec x)))
-  x)
+  ([spex x]
+   (assert-spec-valid spex x nil))
+  ([spec x data]
+   (when-not (s/valid? spec x)
+     (throw (ex-invalid-spec spec x data)))
+   x))

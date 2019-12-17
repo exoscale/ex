@@ -122,3 +122,16 @@
 
 (deftest test-thrown-ex-data
   (is (thrown-ex-info-type? ::foo (throw (ex/ex-info "bar" ::foo)))))
+
+(deftest test-type
+  (is (ex/type? (ex/ex-info "bar" ::foo)
+                ::foo))
+
+  (is (not (ex/type? (ex/ex-info "bar" ::foo22)
+                     ::bar)))
+
+  (is (ex/type? (ex/ex-info "bar" [::fx [::xx]])
+                ::xx))
+
+  (is (not (ex/type? (ex/ex-info "bar" [::fx [::xx]])
+                     ::xxy))))
