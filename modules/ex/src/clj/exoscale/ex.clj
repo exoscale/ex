@@ -114,7 +114,7 @@
 (defn type?
   "Returns true if `ex` is an ex-info with descendant/type of `type`"
   [ex t]
-  (some-> ex meta :type (isa? t)))
+  (some-> ex ex-data :type (isa? t)))
 
 (s/fdef catch*
   :args (s/cat :exception ::exception
@@ -127,11 +127,11 @@
   `handler` with the ex-data, otherwise `continue` with the original
   exception."
   [e type-key handler continue]
-  (let [d (ex-data e)]
-    (if (type? d type-key)
-      (do (assert-ex-data-valid d)
-          (handler (data+ex d e)))
-      (continue e))))
+  (if (type? e type-key)
+    (let [d (ex-data e)]
+      (assert-ex-data-valid d)
+      (handler (data+ex d e)))
+    (continue e)))
 
 (s/def ::try$catch-exception
   (s/cat :clause catch-sym?
