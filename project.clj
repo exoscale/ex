@@ -1,4 +1,4 @@
-(defproject ex-parent "0.3.6"
+(defproject ex-parent "0.3.7-SNAPSHOT"
 
   :plugins [[lein-modules "0.3.11"]]
   :deploy-repositories [["releases" :clojars] ["snapshots" :clojars]]
