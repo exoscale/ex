@@ -4,6 +4,22 @@ Exception handling library for clojure(+manifold)
 
 ![ex](x.png)
 
+## Api docs
+
+* [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex)](https://cljdoc.xyz/d/exoscale/ex/CURRENT) ex
+
+* [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-manifold)](https://cljdoc.xyz/d/exoscale/ex-manifold/CURRENT) ex-manifold
+
+* [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-auspex)](https://cljdoc.xyz/d/exoscale/ex-auspex/CURRENT) ex-auspex (completable future)
+
+## Installation
+
+[![Clojars Project](https://img.shields.io/clojars/v/exoscale/ex.svg)](https://clojars.org/exoscale/ex)
+
+[![Clojars Project](https://img.shields.io/clojars/v/exoscale/ex-manifold.svg)](https://clojars.org/exoscale/ex-manifold)
+
+[![Clojars Project](https://img.shields.io/clojars/v/exoscale/ex-auspex.svg)](https://clojars.org/exoscale/ex-auspex)
+
 ## Rationale
 
 * We want to be able to express/handle exceptions via `ex-info` in a
@@ -249,20 +265,3 @@ Some real life examples of usage for this:
   show via a derived :type.
 
 * Skip sentry logging for some kind of exceptions (or the inverse)
-
-
-## Api docs
-
-* [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex)](https://cljdoc.xyz/d/exoscale/ex/CURRENT) ex
-
-* [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-manifold)](https://cljdoc.xyz/d/exoscale/ex-manifold/CURRENT) ex-manifold
-
-* [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-auspex)](https://cljdoc.xyz/d/exoscale/ex-auspex/CURRENT) ex-auspex (completable future)
-
-## Installation
-
-[![Clojars Project](https://img.shields.io/clojars/v/exoscale/ex.svg)](https://clojars.org/exoscale/ex)
-
-[![Clojars Project](https://img.shields.io/clojars/v/exoscale/ex-manifold.svg)](https://clojars.org/exoscale/ex-manifold)
-
-[![Clojars Project](https://img.shields.io/clojars/v/exoscale/ex-auspex.svg)](https://clojars.org/exoscale/ex-auspex)
