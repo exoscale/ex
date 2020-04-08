@@ -6,11 +6,11 @@ Exception handling library for clojure(+manifold)
 
 ## Api docs
 
-* [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex)](https://cljdoc.xyz/d/exoscale/ex/CURRENT) ex
+* [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex)](https://cljdoc.org/d/exoscale/ex/CURRENT/api/exoscale.ex) ex
 
-* [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-manifold)](https://cljdoc.xyz/d/exoscale/ex-manifold/CURRENT) ex-manifold
+* [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-manifold)](https://cljdoc.org/d/exoscale/ex-manifold/CURRENT/api/exoscale.ex.manifold) ex-manifold
 
-* [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-auspex)](https://cljdoc.xyz/d/exoscale/ex-auspex/CURRENT) ex-auspex (completable future)
+* [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-auspex)](https://cljdoc.xyz/d/exoscale/ex-auspex/CURRENT/api/exoscale.ex.auspex) ex-auspex (completable future)
 
 ## Installation
 
