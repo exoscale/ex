@@ -139,20 +139,32 @@
 
 (deftest datafy
   (let  [x (ex/ex-info "boom"
-                       [::ex/incorrect [::ex/foo ::ex/bar]]
+                       [::datafy [::ex/foo ::ex/bar]]
                        {:a 1}
                        (ex/ex-incorrect "the-cause"))]
     (is (= (p/datafy x)
-           #:exoscale.ex{:type :exoscale.ex/incorrect
+           #:exoscale.ex{:type ::datafy
                          :message "boom"
-                         :data {:a 1, :type :exoscale.ex/incorrect}
+                         :data {:a 1, :type ::datafy}
                          :deriving #{:exoscale.ex/foo :exoscale.ex/bar}
-                         :cause #:exoscale.ex{:type :exoscale.ex/incorrect
+                         :cause #:exoscale.ex{:type ::ex/incorrect
                                               :message "the-cause"
-                                              :data {:type :exoscale.ex/incorrect}
-                                              :deriving #{:exoscale.ex/foo :exoscale.ex/bar}}})
+                                              :data {:type ::ex/incorrect}}})
         "test datafy in")
     (is (= (p/datafy x) (p/datafy (ex/map->ex-info (p/datafy x) {::ex/derive? true})))
         "test roundtrip")
     (is (= (p/datafy x) (p/datafy (ex/map->ex-info (dissoc (p/datafy x) ::ex/deriving))))
-        "test roundtrip without derivation")))
+        "test roundtrip without derivation"))
+
+  (let  [x (ex/ex-incorrect "boom")]
+    (is (= (p/datafy x)
+           #:exoscale.ex{:type :exoscale.ex/incorrect
+                         :message "boom"
+                         :data {:type :exoscale.ex/incorrect}})
+        "test datafy in")
+    (is (= (p/datafy x) (p/datafy (ex/map->ex-info (dissoc (p/datafy x) ::ex/deriving))))
+        "test roundtrip without derivation"))
+
+  (let  [x (clojure.core/ex-info "boom" {})]
+    (is (false? (s/valid? (p/datafy x) ::ex/ex-map))
+        "regular ex info is passthrough")))
