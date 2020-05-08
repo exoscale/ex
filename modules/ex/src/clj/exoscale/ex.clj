@@ -3,7 +3,8 @@
                             parents isa? set-validator!])
   (:require [clojure.spec.alpha :as s]
             [clojure.core.specs.alpha :as cs]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [clojure.core.protocols :as p]))
 
 (defonce hierarchy (atom (make-hierarchy)))
 
@@ -57,6 +58,7 @@
 (defmulti ^:no-doc ex-data-spec :type)
 (defmethod ex-data-spec :default [_] (s/keys :opt-un [::type]))
 
+(s/def ::message string?)
 (s/def ::type qualified-keyword?)
 (s/def ::ex-data (s/multi-spec ex-data-spec :type))
 (s/def ::exception #(instance? Exception %))
@@ -221,9 +223,10 @@
   :args (s/cat :msg string?
                :type+deriving (s/or :type ::type
                                     :type+deriving (s/cat :type ::type
-                                                          :deriving (s/? (s/coll-of ::type))))
+                                                          :deriving (s/? ::deriving)))
                :data (s/? (s/nilable ::ex-data))
                :cause (s/? (s/nilable ::exception))))
+(s/def ::deriving (s/coll-of ::type))
 (defn ex-info
   "Like `clojure.core/ex-info` but adds validation of the ex-data,
   automatic setting of the data `:type` from argument and potential
@@ -298,3 +301,41 @@
    (when-not (s/valid? spec x)
      (throw (ex-invalid-spec spec x data)))
    x))
+
+(s/def ::ex-map
+  (s/keys :req [::message
+                ::type
+                ::data]
+          :opt [::deriving
+                ::cause]))
+(extend-protocol p/Datafiable
+  clojure.lang.ExceptionInfo
+  (datafy [x]
+    (let [{:keys [type] :as data} (ex-data x)]
+      (if type
+        (let [cause (ex-cause x)
+              deriving (parents type)]
+          (cond-> {::type type
+                   ::message (ex-message x)
+                   ::data data}
+            (seq deriving)
+            (assoc ::deriving deriving)
+            (some? cause)
+            (assoc ::cause (p/datafy cause))))
+        (Throwable->map x)))))
+
+(s/fdef map->ex-info
+  :args (s/cat :ex-map ::ex-map
+               :options (s/? (s/keys :opt [::derive?]))))
+(s/def ::derive? boolean?)
+(defn map->ex-info
+  "Turns a datafy'ied ex/ex-info into an ex-info"
+  ([m] (map->ex-info m {}))
+  ([{::keys [message type deriving data cause]}
+    {::keys [derive?] :or {derive? false}}]
+   (ex-info message
+            (cond-> [type]
+              (and derive? (some? deriving))
+              (conj deriving))
+            data
+            (when cause (map->ex-info cause)))))
