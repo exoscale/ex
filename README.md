@@ -256,6 +256,24 @@ We have a few helpers
    ```
    It dispatches via `try+/catch`, so relations are supported.
 
+* we support turning these kind of ex-infos into data via `clojure.core.protocols/datafy`
+  and back into exceptions via `exoscale.ex/map->ex-info`.
+
+
+
+```clj
+=> (clojure.core.protocols/datafy (ex/ex-incorrect "boom" {:a 1} (ex/ex-incorrect "the-cause")))
+#:exoscale.ex{:type :exoscale.ex/incorrect
+               :message "boom"
+               :data {:a 1, :type :exoscale.ex/incorrect}
+               :deriving #{:exoscale.ex/foo :exoscale.ex/bar}
+               :cause #:exoscale.ex{:type :exoscale.ex/incorrect
+                                    :message "the-cause"
+                                    :data {:type :exoscale.ex/incorrect}
+                                    :deriving #{:exoscale.ex/foo :exoscale.ex/bar}}
+
+```
+
 ## Usage examples
 
 Some real life examples of usage for this:
