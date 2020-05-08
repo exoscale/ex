@@ -4,7 +4,8 @@
    [exoscale.ex :as ex]
    [exoscale.ex.test :as t]
    [clojure.spec.alpha :as s]
-   [clojure.spec.test.alpha]))
+   [clojure.spec.test.alpha]
+   [clojure.core.protocols :as p]))
 
 (clojure.spec.test.alpha/instrument)
 
@@ -135,3 +136,23 @@
 
   (is (not (ex/type? (ex/ex-info "bar" [::fx [::xx]])
                      ::xxy))))
+
+(deftest datafy
+  (let  [x (ex/ex-info "boom"
+                       [::ex/incorrect [::ex/foo ::ex/bar]]
+                       {:a 1}
+                       (ex/ex-incorrect "the-cause"))]
+    (is (= (p/datafy x)
+           #:exoscale.ex{:type :exoscale.ex/incorrect
+                         :message "boom"
+                         :data {:a 1, :type :exoscale.ex/incorrect}
+                         :deriving #{:exoscale.ex/foo :exoscale.ex/bar}
+                         :cause #:exoscale.ex{:type :exoscale.ex/incorrect
+                                              :message "the-cause"
+                                              :data {:type :exoscale.ex/incorrect}
+                                              :deriving #{:exoscale.ex/foo :exoscale.ex/bar}}})
+        "test datafy in")
+    (is (= (p/datafy x) (p/datafy (ex/map->ex-info (p/datafy x) {::ex/derive? true})))
+        "test roundtrip")
+    (is (= (p/datafy x) (p/datafy (ex/map->ex-info (dissoc (p/datafy x) ::ex/deriving))))
+        "test roundtrip without derivation")))
