@@ -264,13 +264,13 @@ We have a few helpers
 ```clj
 => (clojure.core.protocols/datafy (ex/ex-incorrect "boom" {:a 1} (ex/ex-incorrect "the-cause")))
 #:exoscale.ex{:type :exoscale.ex/incorrect
-               :message "boom"
-               :data {:a 1, :type :exoscale.ex/incorrect}
-               :deriving #{:exoscale.ex/foo :exoscale.ex/bar}
-               :cause #:exoscale.ex{:type :exoscale.ex/incorrect
-                                    :message "the-cause"
-                                    :data {:type :exoscale.ex/incorrect}
-                                    :deriving #{:exoscale.ex/foo :exoscale.ex/bar}}
+              :message "boom"
+              :data {:a 1, :type :exoscale.ex/incorrect}
+              :deriving #{:exoscale.ex/foo :exoscale.ex/bar}
+              :cause #:exoscale.ex{:type :exoscale.ex/incorrect
+                                   :message "the-cause"
+                                   :data {:type :exoscale.ex/incorrect}
+                                   :deriving #{:exoscale.ex/foo :exoscale.ex/bar}}
 
 ```
 
