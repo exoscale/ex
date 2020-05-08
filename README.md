@@ -272,6 +272,9 @@ We have a few helpers
                                    :data {:type :exoscale.ex/incorrect}
                                    :deriving #{:exoscale.ex/foo :exoscale.ex/bar}}
 
+=> (type (ex/map->ex-info *1))
+clojure.lang.ExceptionInfo
+
 ```
 
 ## Usage examples
