@@ -7,6 +7,7 @@
                              :url
                              :scm
                              :deploy-repositories
+                             :profiles
                              :description
                              :pedantic?]}
   :dependencies [[org.clojure/clojure]])

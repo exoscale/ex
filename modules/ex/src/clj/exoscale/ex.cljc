@@ -76,10 +76,11 @@
   [ex-data]
   (s/assert ::ex-data ex-data))
 
-(defn set-validator!
-  "Sets validation failure handler globally"
-  [f]
-  (alter-var-root #'assert-ex-data-valid (constantly f)))
+#?(:clj
+   (defn set-validator!
+     "Sets validation failure handler globally"
+     [f]
+     (alter-var-root #'assert-ex-data-valid (constantly f))))
 
 (def ^:no-doc catch-sym? #{'catch})
 
