@@ -1,4 +1,12 @@
 (defproject exoscale/ex "0.3.8-SNAPSHOT"
-  :dependencies [[org.clojure/clojure ]]
-  :plugins [[lein-modules "0.3.11"]]
-  :modules {:parent "../../"})
+  :plugins [[lein-parent "0.3.8"]]
+  :source-paths ["src/clj"]
+  :parent-project {:path "../../project.clj"
+                   :inherit [:managed-dependencies
+                             :license
+                             :url
+                             :scm
+                             :deploy-repositories
+                             :description
+                             :pedantic?]}
+  :dependencies [[org.clojure/clojure]])
