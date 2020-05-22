@@ -254,6 +254,7 @@
 (defmacro ^:no-doc gen-ex-fn-for-type
   [type]
   (let [sym (symbol (str "ex-" (name type)))
+        bangsym (symbol (str "ex-" (name type) "!"))
         msg 'msg
         data 'data
         cause 'cause]
@@ -262,6 +263,11 @@
          :args (s/cat :msg (s/and string? (complement str/blank?))
                       :data (s/? (s/nilable ::ex-data))
                       :cause (s/? (s/nilable ::exception))))
+       (s/fdef ~bangsym
+         :args (s/cat :msg (s/and string? (complement str/blank?))
+                      :data (s/? (s/nilable ::ex-data))
+                      :cause (s/? (s/nilable ::exception))))
+
        (defn ~sym
          ~(format (str "Returns an ex-info with ex-data `:type` set to %s. Rest of "
                        "the arguments match `ex-info`")
@@ -272,7 +278,17 @@
           (~sym ~msg ~data nil))
          ([~msg ~data ~cause]
           (let [~data (assoc ~data :type ~type)]
-            (ex-info ~msg ~type ~data ~cause)))))))
+            (ex-info ~msg ~type ~data ~cause))))
+
+       (defn ~bangsym
+         ~(format "Builds an exception with %s and throws it." sym)
+         ([~msg]
+          (throw (~sym ~msg nil nil)))
+         ([~msg ~data]
+          (throw (~sym ~msg ~data nil)))
+         ([~msg ~data ~cause]
+          (throw (~sym ~msg ~data ~cause)))))))
+
 (run! (fn [t] (eval `(gen-ex-fn-for-type ~t))) types)
 
 (s/fdef ex-invalid-spec
