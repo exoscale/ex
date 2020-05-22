@@ -16,6 +16,8 @@
                          [exoscale/ex-manifold :version]
                          [exoscale/ex-auspex   :version]]
 
+  :profiles {:dev {:plugins [[lein-cljfmt "0.6.7"]]}}
+
   :sub ["modules/ex"
         "modules/ex-manifold"
         "modules/ex-auspex"]

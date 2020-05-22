@@ -6,6 +6,7 @@
                              :url
                              :scm
                              :deploy-repositories
+                             :profiles
                              :description
                              :pedantic?]}
   :source-paths ["src/clj"]

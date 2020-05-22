@@ -20,30 +20,30 @@
   (let [d {:type ::foo}]
     (is (= d
            (ex/try+
-             (throw (ex-info "asdf" d))
-             (catch ::foo x
-               x))))
+            (throw (ex-info "asdf" d))
+            (catch ::foo x
+              x))))
 
     (is (true?
          (ex/try+
-           true
-           (catch ::foo x
-             x))))
+          true
+          (catch ::foo x
+            x))))
 
     ;; no match but still ex-info
     (is (= {:type ::asdf}
            (ex-data (try-val
                      (ex/try+
-                       (throw (ex-info "asdf" {:type ::asdf}))
-                       (catch ::foo x
-                         x))))))
+                      (throw (ex-info "asdf" {:type ::asdf}))
+                      (catch ::foo x
+                        x))))))
 
     (is (instance? Exception
                    (try-val
                     (ex/try+
-                      (throw (Exception. "boom"))
-                      (catch ::foo x
-                        x)))))))
+                     (throw (Exception. "boom"))
+                     (catch ::foo x
+                       x)))))))
 
 (deftest test-catch
   (let [d {:type ::foo}]
@@ -65,50 +65,50 @@
   (ex/derive ::bar ::foo)
   (let [d {:type ::bar}]
     (is (ex/try+
-          (throw (ex-info "" d))
-          (catch ::foo ex
-            (= ex d)))))
+         (throw (ex-info "" d))
+         (catch ::foo ex
+           (= ex d)))))
 
   (ex/derive ::baz ::bar)
   (let [e {:type ::baz}]
     (is (ex/try+
-          (throw (ex-info "" e))
-          (catch ::foo ex
-            (= ex e)))))
+         (throw (ex-info "" e))
+         (catch ::foo ex
+           (= ex e)))))
 
   (let [e {:type ::bak}]
     (is (try-val (ex/try+
-                   (throw (ex-info "" e))
-                   (catch ::foo ex
-                     (= e ex)))))))
+                  (throw (ex-info "" e))
+                  (catch ::foo ex
+                    (= e ex)))))))
 
 (deftest test-bindings
   (is (ex/try+
-        (throw (ex-info "" {:type ::foo
-                            :bar 1}))
-        (catch ::foo {:keys [bar]}
-          (= bar 1)))))
+       (throw (ex-info "" {:type ::foo
+                           :bar 1}))
+       (catch ::foo {:keys [bar]}
+         (= bar 1)))))
 
 (deftest special-binding
   (ex/try+
-    (throw (ex-info "" {:type ::foo
-                        :bar 1}))
-    (catch ::foo {:as e}
-      (let [e &ex]
-        (ex/try+
-          (throw (ex-info "" {:type ::bar}))
-          (catch ::bar b
-            (is (not= &ex e))
-            (is (instance? Exception &ex))
-            (is (instance? Exception e))))))))
+   (throw (ex-info "" {:type ::foo
+                       :bar 1}))
+   (catch ::foo {:as e}
+     (let [e &ex]
+       (ex/try+
+        (throw (ex-info "" {:type ::bar}))
+        (catch ::bar b
+          (is (not= &ex e))
+          (is (instance? Exception &ex))
+          (is (instance? Exception e))))))))
 
 (deftest test-complex-meta
   (let [x (ex-info "" {:type ::ex-with-meta})]
     (is (ex/try+
-          (throw x)
-          (catch ::ex-with-meta
-              x'
-            (-> x' meta ::ex/exception (= x)))))))
+         (throw x)
+         (catch ::ex-with-meta
+                x'
+           (-> x' meta ::ex/exception (= x)))))))
 
 (deftest test-spec
   (s/def ::foo string?)
@@ -118,8 +118,8 @@
 
 (deftest test-within-eval
   (is (= 1 (eval `(do (ex/try+
-                        (throw (ex-info "boom" {:type ::bar}))
-                        (catch ::bar e# 1)))))))
+                       (throw (ex-info "boom" {:type ::bar}))
+                       (catch ::bar e# 1)))))))
 
 (deftest test-thrown-ex-data
   (is (thrown-ex-info-type? ::foo (throw (ex/ex-info "bar" ::foo)))))

@@ -12,29 +12,29 @@
   (is (= ::boom
          @(-> (d/error-deferred (ex-info "bar" {:type ::bar1 :bar :baz}))
               (m/catch ::bar1
-                  (fn [d] ::boom)))))
+                       (fn [d] ::boom)))))
 
   (ex/derive ::bar1 ::baz1)
   (is (= ::boom
          @(-> (d/error-deferred (ex-info "bar" {:type ::bar1 :bar :baz}))
               (m/catch ::baz1
-                  (fn [d] ::boom)))))
+                       (fn [d] ::boom)))))
   (ex/underive ::bar1 ::baz1)
 
   (is (thrown? clojure.lang.ExceptionInfo
                @(-> (d/error-deferred (ex-info "bar" {:type ::bar1 :bar :baz}))
                     (m/catch ::bak1
-                        (fn [d] ::boom)))))
+                             (fn [d] ::boom)))))
   (is (= :foo
          @(-> (d/success-deferred :foo)
               (m/catch ::bak1
-                  (fn [d] ::boom))))))
+                       (fn [d] ::boom))))))
 
 (deftest test-collisions
   (testing "make sure manifold catch is not interpreted as try+/catch"
     (is (= 1 (ex/try+
               (m/catch (d/error-deferred (ex-info "foo" {:type :bar}))
-                  :foo
+                       :foo
                 (fn [& args] nil))
               1
               (catch ::something e
