@@ -1,5 +1,14 @@
 (defproject exoscale/ex-auspex "0.3.8-SNAPSHOT"
-  :dependencies [[cc.qbits/auspex "0.1.0-alpha2"]]
-  :profiles {:dev {:dependencies [[exoscale/ex :version]]}}
-  :plugins [[lein-modules "0.3.11"]]
-  :modules {:parent "../../"})
+  :plugins [[lein-parent "0.3.8"]]
+  :parent-project {:path "../../project.clj"
+                   :inherit [:managed-dependencies
+                             :license
+                             :url
+                             :scm
+                             :deploy-repositories
+                             :description
+                             :pedantic?]}
+  :source-paths ["src/clj"]
+  :dependencies [[org.clojure/clojure]
+                 [exoscale/ex]
+                 [cc.qbits/auspex]])
