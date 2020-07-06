@@ -145,11 +145,11 @@
     (is (= (p/datafy x)
            #:exoscale.ex{:type ::datafy
                          :message "boom"
-                         :data {:a 1, :type ::datafy}
+                         :data {:a 1}
                          :deriving #{:exoscale.ex/foo :exoscale.ex/bar}
                          :cause #:exoscale.ex{:type ::ex/incorrect
                                               :message "the-cause"
-                                              :data {:type ::ex/incorrect}}})
+                                              :data {}}})
         "test datafy in")
     (is (= (p/datafy x) (p/datafy (ex/map->ex-info (p/datafy x) {::ex/derive? true})))
         "test roundtrip")
@@ -160,7 +160,7 @@
     (is (= (p/datafy x)
            #:exoscale.ex{:type :exoscale.ex/incorrect
                          :message "boom"
-                         :data {:type :exoscale.ex/incorrect}})
+                         :data {}})
         "test datafy in")
     (is (= (p/datafy x) (p/datafy (ex/map->ex-info (dissoc (p/datafy x) ::ex/deriving))))
         "test roundtrip without derivation"))

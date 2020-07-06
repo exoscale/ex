@@ -334,7 +334,7 @@
               deriving (parents type)]
           (cond-> {::type type
                    ::message (ex-message x)
-                   ::data data}
+                   ::data (dissoc data :type)}
             (seq deriving)
             (assoc ::deriving deriving)
             (some? cause)
