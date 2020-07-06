@@ -325,6 +325,8 @@
                 ::data]
           :opt [::deriving
                 ::cause]))
+(s/def ::cause ::ex-map)
+
 (extend-protocol p/Datafiable
   clojure.lang.ExceptionInfo
   (datafy [x]
@@ -334,7 +336,7 @@
               deriving (parents type)]
           (cond-> {::type type
                    ::message (ex-message x)
-                   ::data data}
+                   ::data (dissoc data :type)}
             (seq deriving)
             (assoc ::deriving deriving)
             (some? cause)
