@@ -325,6 +325,8 @@
                 ::data]
           :opt [::deriving
                 ::cause]))
+(s/def ::cause ::ex-map)
+
 (extend-protocol p/Datafiable
   clojure.lang.ExceptionInfo
   (datafy [x]
