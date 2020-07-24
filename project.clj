@@ -14,13 +14,15 @@
                          [cc.qbits/auspex      "0.1.0-alpha2"]
                          [exoscale/ex          :version]
                          [exoscale/ex-manifold :version]
-                         [exoscale/ex-auspex   :version]]
+                         [exoscale/ex-auspex   :version]
+                         [exoscale/ex-http     :version]]
 
   :profiles {:dev {:plugins [[lein-cljfmt "0.6.7"]]}}
 
   :sub ["modules/ex"
         "modules/ex-manifold"
-        "modules/ex-auspex"]
+        "modules/ex-auspex"
+        "modules/ex-http"]
 
   :release-tasks [["vcs" "assert-committed"]
                   ["sub" "change" "version" "leiningen.release/bump-version" "release"]
