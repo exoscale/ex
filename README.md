@@ -12,6 +12,8 @@ Exception handling library for clojure(+manifold)
 
 * [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-auspex)](https://cljdoc.xyz/d/exoscale/ex-auspex/CURRENT/api/exoscale.ex.auspex) ex-auspex (completable future)
 
+* [![cljdoc badge](https://cljdoc.xyz/badge/exoscale/ex-http)](https://cljdoc.xyz/d/exoscale/ex-http/CURRENT/api/exoscale.ex.http) ex-http
+
 ## Installation
 
 [![Clojars Project](https://img.shields.io/clojars/v/exoscale/ex.svg)](https://clojars.org/exoscale/ex)
@@ -19,6 +21,8 @@ Exception handling library for clojure(+manifold)
 [![Clojars Project](https://img.shields.io/clojars/v/exoscale/ex-manifold.svg)](https://clojars.org/exoscale/ex-manifold)
 
 [![Clojars Project](https://img.shields.io/clojars/v/exoscale/ex-auspex.svg)](https://clojars.org/exoscale/ex-auspex)
+
+[![Clojars Project](https://img.shields.io/clojars/v/exoscale/ex-http.svg)](https://clojars.org/exoscale/ex-http)
 
 ## Rationale
 
@@ -183,7 +187,7 @@ This is very much inspired by
 
 We have simple wrappers to create ex-info based on this:
 `ex/ex-unavailable`, `ex/ex-interrupted` and so on. Their signature is
-identical to `ex-info` otherwise.
+identical to `ex-info` otherwise. An `ex-http/response->ex-info` utility function that maps HTTP status codes onto this taxonomy is available in the `ex.http` namespace.
 
 ## How to generate/use good ex-infos
 
