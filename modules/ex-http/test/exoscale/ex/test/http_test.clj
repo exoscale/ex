@@ -30,13 +30,13 @@
 
 (deftest response->ex-info
   (testing "Should return ex/fault as the default option"
-    (is (thrown-ex-info-type? ::ex/fault (ex-http/response->ex-info {:status :not-mapped}))))
+    (is (thrown-ex-info-type? ::ex/fault (ex-http/response->ex-info! {:status :not-mapped}))))
 
   (testing "Should return ex/not-found for a 404"
-    (is (thrown-ex-info-type? ::ex/not-found (ex-http/response->ex-info {:status 404}))))
+    (is (thrown-ex-info-type? ::ex/not-found (ex-http/response->ex-info! {:status 404}))))
 
   (testing "Should allow overwriting in a consuming namespace"
-    (do (defmethod ex-http/response->ex-info 404 [_] ::overwritten)
+    (do (defmethod ex-http/response->ex-info! 404 [_] ::overwritten)
         (is (= ::overwritten
-               (ex-http/response->ex-info {:status 404}))))))
+               (ex-http/response->ex-info! {:status 404}))))))
 
