@@ -278,8 +278,7 @@
          ([~msg ~data]
           (~sym ~msg ~data nil))
          ([~msg ~data ~cause]
-          (let [~data (assoc ~data :type ~type)]
-            (ex-info ~msg ~type ~data ~cause))))
+          (ex-info ~msg ~type ~data ~cause)))
 
        (defn ~bangsym
          ~(format "Builds an exception with %s and throws it." sym)
@@ -305,7 +304,7 @@
                         [::invalid-spec [::incorrect]]
                         (assoc data :explain-data (s/explain-data spec x)))))
 
-(s/fdef ex-invalid-spec
+(s/fdef assert-spec-valid
   :args (s/cat :spec qualified-keyword?
                :x any?
                :data (s/? (s/nilable ::ex-data))))
