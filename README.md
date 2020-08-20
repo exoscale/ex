@@ -57,9 +57,10 @@ So we have `exoscale.ex/try+`, which supports vanilla `catch`/`finally`
 clauses.
 
 If you specify a `catch` clause with a keyword as first argument
-things get interesting. **We assume you always put a `:type` key in
-the ex-infos you generate**, and will match its value to the value of
-the key in the `catch` clause.
+things get interesting. **We assume you always put an
+`:exoscale.ex/type` or `:type` key in the ex-infos you
+generate**, and will match its value to the value of the key in the
+`catch` clause.
 
 ### The basics
 
@@ -79,7 +80,7 @@ So you can do things like that.
 
 (ex/try+
 
-  (throw (ex-info "Argh" {:type ::bar :foo "a foo"}))
+  (throw (ex-info "Argh" {::ex/type ::bar :foo "a foo"}))
 
   (catch ::foo data
     (prn :got-ex-data data))
@@ -109,7 +110,7 @@ classes directly.
 (ex/derive ::bar ::foo)
 
 (ex/try+
-  (throw (ex-info "I am a bar" {:type ::bar})
+  (throw (ex-info "I am a bar" {::ex/type ::bar})
   (catch ::foo d
     (prn "got a foo with data" d)
     (prn "Original exception instance is " (-> d meta ::ex/exception))))
@@ -125,7 +126,7 @@ of a `catch` block in `try+` but with a more manifold like feel.
 (require '[exoscale.ex.manifold :as mx])
 (require '[manifold.deferred :as d])
 
-(-> (d/error-deferred (ex-info "boom" {:type :bar}))
+(-> (d/error-deferred (ex-info "boom" {::ex/type :bar}))
     (mx/catch :bar (fn [data] (prn "ex-data is: " data)))
     (d/catch (fn [ex] "... regular manifold handling here")))
 ```
@@ -163,9 +164,9 @@ ex-data we extract, it's under the `:exoscale.ex/exception` key.
 If you are within a `try+` block you can also access it directly via
 `&ex`
 
-###  Our default internal `:type`s table
+###  Our default internal error type table
 
-We suggest you also either use one of these as `:type` or derive your
+We suggest you also either use one of these as `::ex/type` or derive your
 own with these.
 
 Within the namespace `:exoscale.ex`:
@@ -191,7 +192,7 @@ identical to `ex-info` otherwise. An `ex-http/response->ex-info` utility functio
 
 ## How to generate/use good ex-infos
 
-* Specify a `:type` key **always**
+* Specify a `:exoscale.ex/type` key **always**
 
 * The type key should either be one of our base type or a descendent.
   Descendents should be avoided when possible.
@@ -211,7 +212,7 @@ identical to `ex-info` otherwise. An `ex-http/response->ex-info` utility functio
   in the upstream data source at least there's is no risk of leaking
   them with the exception that way.
 
-* If you use more than once the same `:type` you might want to spec it
+* If you use more than once the same `type` you might want to spec it
 
 * Avoid returning raw values in error-deferreds, return properly
   formated ex-infos
@@ -229,7 +230,7 @@ We have a few helpers
 * `exoscale.ex/ex-info`.
 
     ```clj
-    ;; shortest, just a msg and {:type ::incorrect}
+    ;; shortest, just a msg and {::ex/type ::incorrect}
     (ex/ex-info "Oh no" ::incorrect)
 
     ;; same with some ex-data
@@ -269,11 +270,11 @@ We have a few helpers
 => (clojure.core.protocols/datafy (ex/ex-incorrect "boom" {:a 1} (ex/ex-incorrect "the-cause")))
 #:exoscale.ex{:type :exoscale.ex/incorrect
               :message "boom"
-              :data {:a 1, :type :exoscale.ex/incorrect}
+              :data {:a 1}
               :deriving #{:exoscale.ex/foo :exoscale.ex/bar}
               :cause #:exoscale.ex{:type :exoscale.ex/incorrect
                                    :message "the-cause"
-                                   :data {:type :exoscale.ex/incorrect}
+                                   :data {...}
                                    :deriving #{:exoscale.ex/foo :exoscale.ex/bar}}
 
 => (type (ex/map->ex-info *1))
@@ -287,6 +288,6 @@ Some real life examples of usage for this:
 
 * Deny all display of user exceptions to the end-user by default via
   top level middleware and only let through the ones marked safe to
-  show via a derived :type.
+  show via a derived `type`.
 
 * Skip sentry logging for some kind of exceptions (or the inverse)

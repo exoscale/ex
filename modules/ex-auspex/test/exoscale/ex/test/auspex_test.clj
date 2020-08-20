@@ -9,7 +9,7 @@
 (clojure.spec.test.alpha/instrument)
 
 (deftest test-auspex
-  (let [ex (ex-info "bar" {:type ::bar1 :bar :baz})]
+  (let [ex (ex-info "bar" {::ex/type ::bar1 :bar :baz})]
     (is (= ::boom
            @(-> (a/error-future ex)
                 (c/catch ::bar1
