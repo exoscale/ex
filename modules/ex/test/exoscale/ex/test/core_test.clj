@@ -150,6 +150,7 @@
                        {:a 1}
                        (ex/ex-incorrect "the-cause"))]
     (is (= (p/datafy x)
+           (ex/datafy x)
            #:exoscale.ex{:exoscale.ex/type ::datafy
                          :message "boom"
                          :data {:a 1}

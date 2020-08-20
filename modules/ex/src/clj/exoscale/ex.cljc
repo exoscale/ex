@@ -363,6 +363,11 @@
             (assoc ::cause (p/datafy cause))))
         (Throwable->map x)))))
 
+(defn datafy
+  "Convenience function to call datafy on a potential exception"
+  [ex]
+  (p/datafy ex))
+
 (s/fdef map->ex-info
   :args (s/cat :ex-map ::ex-map
                :options (s/? (s/keys :opt [::derive?]))))
