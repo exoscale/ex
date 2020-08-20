@@ -350,11 +350,11 @@
 (extend-protocol p/Datafiable
   clojure.lang.ExceptionInfo
   (datafy [x]
-    (let [{:keys [type] :as data} (ex-data x)]
-      (if type
+    (let [data (ex-data x)]
+      (if-let [t (type data)]
         (let [cause (ex-cause x)
-              deriving (parents type)]
-          (cond-> {::type type
+              deriving (parents t)]
+          (cond-> {::type t
                    ::message (ex-message x)
                    ::data (dissoc data :type ::type)}
             (seq deriving)
