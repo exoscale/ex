@@ -1,6 +1,6 @@
 (ns exoscale.ex
   (:refer-clojure :exclude [ex-info derive underive ancestors descendants
-                            parents isa? set-validator!])
+                            parents isa? set-validator! type])
   (:require [clojure.spec.alpha :as s]
             [clojure.core.specs.alpha :as cs]
             [clojure.string :as str]
@@ -55,12 +55,33 @@
   [child parent]
   (clojure.core/isa? @hierarchy child parent))
 
-(defmulti ^:no-doc ex-data-spec :type)
-(defmethod ex-data-spec :default [_] (s/keys :opt-un [::type]))
+(s/fdef type
+  :args (s/cat :ex-data (s/nilable map?)))
+(defn type
+  "Returns `type` value from ex-data map (not the ex-info instance, use
+  `ex-type` for this"
+  [d]
+  (or (::type d)
+      ;; backward compatibility
+      (:type d)))
+
+(s/fdef ex-type
+  :args (s/cat :ex ::exception))
+(defn ex-type
+  "Returns the `type` of the ex-info if possible"
+  [ex]
+  (type (ex-data ex)))
+
+(defmulti ^:no-doc ex-data-spec type)
+(defmethod ex-data-spec :default [_]
+  (s/keys
+   :opt [::type]
+   ;; backward compat
+   :opt-un [::type]))
 
 (s/def ::message string?)
 (s/def ::type qualified-keyword?)
-(s/def ::ex-data (s/multi-spec ex-data-spec :type))
+(s/def ::ex-data (s/multi-spec ex-data-spec ::type))
 (s/def ::exception #(instance? Exception %))
 
 (s/fdef set-ex-data-spec!
@@ -117,7 +138,7 @@
 (defn type?
   "Returns true if `ex` is an ex-info with descendant/type of `type`"
   [ex t]
-  (some-> ex ex-data :type (isa? t)))
+  (some-> ex ex-type (isa? t)))
 
 (s/fdef catch*
   :args (s/cat :exception ::exception
@@ -167,11 +188,12 @@
   "Like try but with support for ex-info/ex-data.
 
   If you pass a `catch-data` form it will try to match an
-  ex-info :type key, or it's potential ancestors in the local hierarchy.
+  ex-info :exoscale.ex/type key (or just :type), or it's potential
+  ancestors in the local hierarchy.
 
   ex-info clauses are checked first, in the order they were specified.
-  catch-data will take as arguments a :type key, and a binding for
-  the ex-data of the ex-info instance.
+  catch-data will take as arguments a type key, and a binding for the
+  ex-data of the ex-info instance.
 
   (try
     [...]
@@ -201,7 +223,7 @@
            (seq catch-data-clauses)
            (conj `(catch clojure.lang.ExceptionInfo ~ex-sym
                     (let [~data-sym (ex-data ~ex-sym)
-                          ~type-sym (:type ~data-sym)]
+                          ~type-sym (type ~data-sym)]
                       (cond
                         ~@(mapcat (fn [[_ type binding & body]]
                                     `[(isa? ~type-sym ~type)
@@ -243,7 +265,9 @@
                  coll-type?
                  first)
          deriving (when coll-type? (second type))
-         data' (assoc data :type type')]
+         data' (assoc data
+                      :type type' ; backward compatibility
+                      ::type type')]
      (assert-ex-data-valid data')
      (run! #(derive type' %) deriving)
      (clojure.core/ex-info msg
@@ -329,18 +353,23 @@
 (extend-protocol p/Datafiable
   clojure.lang.ExceptionInfo
   (datafy [x]
-    (let [{:keys [type] :as data} (ex-data x)]
-      (if type
+    (let [data (ex-data x)]
+      (if-let [t (type data)]
         (let [cause (ex-cause x)
-              deriving (parents type)]
-          (cond-> {::type type
+              deriving (parents t)]
+          (cond-> {::type t
                    ::message (ex-message x)
-                   ::data (dissoc data :type)}
+                   ::data (dissoc data :type ::type)}
             (seq deriving)
             (assoc ::deriving deriving)
             (some? cause)
             (assoc ::cause (p/datafy cause))))
         (Throwable->map x)))))
+
+(defn datafy
+  "Convenience function to call datafy on a potential exception"
+  [ex]
+  (p/datafy ex))
 
 (s/fdef map->ex-info
   :args (s/cat :ex-map ::ex-map
