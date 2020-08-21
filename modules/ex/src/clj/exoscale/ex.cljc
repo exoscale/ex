@@ -58,6 +58,8 @@
 (s/fdef type
   :args (s/cat :ex-data (s/nilable map?)))
 (defn type
+  "Returns `type` value from ex-data map (not the ex-info instance, use
+  `ex-type` for this"
   [d]
   (or (::type d)
       ;; backward compatibility
@@ -66,6 +68,7 @@
 (s/fdef ex-type
   :args (s/cat :ex ::exception))
 (defn ex-type
+  "Returns the `type` of the ex-info if possible"
   [ex]
   (type (ex-data ex)))
 
