@@ -44,7 +44,7 @@
 
 (defn- assert-ret-valid
   [fn-name spec args ret opts]
-  (when-not (s/valid? spec args)
+  (when-not (s/valid? spec ret)
     ((:exoscale.ex.instrumentation/incorrect-ret! opts)
      fn-name spec args ret)))
 
@@ -60,7 +60,8 @@
         fn-sym (symbol (str *ns*) (str fn-name))]
     (if (and *enabled* (or args ret))
       `(do
-         ;; instead of messing with a registry just emit a private fn for the original
+         ;; instead of messing with a registry just emit a private fn
+         ;; for the original
          (defn- ~instrumented-fn-sym
            ~@(rest defn-args))
          ~(let [fn-args (gensym "fn-args")
@@ -70,15 +71,19 @@
                 assert-opts (merge default-options meta)]
             `(let [~args-spec-sym ~args
                    ~ret-spec-sym ~ret]
+               ;; generate the wrapper
                (clojure.core/defn ~@(remove nil? [fn-name docstring meta])
                  [& ~fn-args]
+                 ;; only emit args check if meta args is present
                  ~(when args
                     `(assert-args-valid '~fn-sym
                                         ~args-spec-sym
                                         ~fn-args
                                         ~assert-opts))
-                 ;; could use .applyTo with clj, or even dispatch on invoke with right # of args
+                 ;; TODO could use .applyTo with clj, or even dispatch
+                 ;; on invoke with right # of args
                  (let [~fn-ret (apply ~instrumented-fn-sym ~fn-args)]
+                   ;; only emit ret check if meta ret present
                    ~(if ret
                       `(assert-ret-valid '~fn-sym
                                          ~ret-spec-sym
@@ -86,7 +91,7 @@
                                          ~fn-ret
                                          ~assert-opts)
                       fn-ret)))
-               ;; set proper arglist
+               ;; set proper arglist for tooling/docs
                #?(:clj (alter-meta! #'~fn-name
                                     assoc :arglists
                                     (-> #'~instrumented-fn-sym meta :arglists)))
@@ -94,10 +99,11 @@
       ;; emit regular fn if not ret/args spec is found
       `(clojure.core/defn ~@defn-args))))
 
-(defn foo
-  "asdf"
-  {:args (s/cat :a string?)
-   :ret number?}
-  [^String a] a)
+(comment (defn foo
+           "It does something"
+           {:args (s/cat :a string?)
+            :ret number?}
+           [^String a]
+           1))
 
-;; (foo "as")
+(foo "as")
