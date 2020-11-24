@@ -148,7 +148,7 @@
   (let  [x (ex/ex-info "boom"
                        [::datafy [::ex/foo ::ex/bar]]
                        {:a 1}
-                       (ex/ex-incorrect "the-cause"))]
+                       (ex/ex-incorrect "the-cause" {:key "value"}))]
     (is (= (p/datafy x)
            (ex/datafy x)
            #:exoscale.ex{:exoscale.ex/type ::datafy
@@ -157,12 +157,28 @@
                          :deriving #{:exoscale.ex/foo :exoscale.ex/bar}
                          :cause #:exoscale.ex{:exoscale.ex/type ::ex/incorrect
                                               :message "the-cause"
-                                              :data {}}})
+                                              :data {:key "value"}}})
         "test datafy in")
+    (is (true? (s/valid? ::ex/ex-map (p/datafy x)))
+        "datafy are ::ex/ex-map")
+    (is (true? (s/valid? ::ex/ex-map (p/datafy (ex/map->ex-info (ex/datafy x)))))
+        "roundtrip datafy are ::ex/ex-map")
     (is (= (p/datafy x) (p/datafy (ex/map->ex-info (p/datafy x) {::ex/derive? true})))
         "test roundtrip")
     (is (= (p/datafy x) (p/datafy (ex/map->ex-info (dissoc (p/datafy x) ::ex/deriving))))
         "test roundtrip without derivation"))
+
+  (let  [x (ex/ex-info "boom"
+                       [::datafy [::ex/foo ::ex/bar]]
+                       {:a 1}
+                       (clojure.core/ex-info "the-cause" {:key "value"} (Exception. "root-cause")))]
+    (is (true? (s/valid? ::ex/ex-map (p/datafy x)))
+        "datafy are ::ex/ex-map")
+    (is (true? (s/valid? ::ex/ex-map (p/datafy (ex/map->ex-info (p/datafy x)))))
+        "roundtrip datafy are ::ex/ex-map")
+    (is (= [{:message "the-cause" :data {:key "value"}}
+            {:message "root-cause" :data {}}]
+           (map #(dissoc % :at :type) (get-in (p/datafy (ex/map->ex-info (p/datafy x))) [:exoscale.ex/cause :via])))))
 
   (let  [x (ex/ex-incorrect "boom")]
     (is (= (p/datafy x)
@@ -174,5 +190,5 @@
         "test roundtrip without derivation"))
 
   (let  [x (clojure.core/ex-info "boom" {})]
-    (is (false? (s/valid? (p/datafy x) ::ex/ex-map))
+    (is (false? (s/valid? ::ex/ex-map (p/datafy x)))
         "regular ex info is passthrough")))

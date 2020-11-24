@@ -348,7 +348,21 @@
                 ::data]
           :opt [::deriving
                 ::cause]))
-(s/def ::cause ::ex-map)
+(s/def ::cause (s/or :ex-map    ::ex-map
+                     :throwable ::throwable))
+
+(s/def ::throwable (s/keys :req-un [:throwable/via]
+                           :opt-un [:throwable/cause
+                                    :throwable/data
+                                    :throwable/phase]))
+(s/def :throwable/via (s/coll-of (s/keys :req-un [:throwable/type]
+                                         :opt-un [:throwable/message
+                                                  :throwable/data])))
+(s/def :throwable/cause string?)
+(s/def :throwable/message string?)
+(s/def :throwable/data map?)
+(s/def :throwable/phase string?)
+
 (s/def ::data ::ex-data)
 
 (extend-protocol p/Datafiable
@@ -373,17 +387,29 @@
   (p/datafy ex))
 
 (s/fdef map->ex-info
-  :args (s/cat :ex-map ::ex-map
+  :args (s/cat :ex-map (s/or :ex-map ::ex-map :throwable ::throwable)
                :options (s/? (s/keys :opt [::derive?]))))
 (s/def ::derive? boolean?)
 (defn map->ex-info
   "Turns a datafy'ied ex/ex-info into an ex-info"
   ([m] (map->ex-info m {}))
-  ([{::keys [message type deriving data cause]}
+  ([{::keys [message type deriving data cause]
+     :keys [via]
+     :as m}
     {::keys [derive?] :or {derive? false}}]
-   (ex-info message
-            (cond-> [type]
-              (and derive? (some? deriving))
-              (conj deriving))
-            data
-            (when cause (map->ex-info cause)))))
+   (cond
+     (s/valid? ::ex-map m)
+     (ex-info message
+              (cond-> [type]
+                (and derive? (some? deriving))
+                (conj deriving))
+              data
+              (when cause (map->ex-info cause)))
+
+     (s/valid? ::throwable m)
+     (reduce (fn [e {:keys [message data] :or {data {}}}]
+               (if e
+                 (clojure.core/ex-info message data e)
+                 (clojure.core/ex-info message data)))
+             nil
+             (rseq via)))))
