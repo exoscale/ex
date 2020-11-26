@@ -346,22 +346,7 @@
   (s/keys :req [::message
                 ::type
                 ::data]
-          :opt [::deriving
-                ::cause]))
-(s/def ::cause (s/or :ex-map    ::ex-map
-                     :throwable ::throwable))
-
-(s/def ::throwable (s/keys :req-un [:throwable/via]
-                           :opt-un [:throwable/cause
-                                    :throwable/data
-                                    :throwable/phase]))
-(s/def :throwable/via (s/coll-of (s/keys :req-un [:throwable/type]
-                                         :opt-un [:throwable/message
-                                                  :throwable/data])))
-(s/def :throwable/cause string?)
-(s/def :throwable/message string?)
-(s/def :throwable/data map?)
-(s/def :throwable/phase string?)
+          :opt [::deriving]))
 
 (s/def ::data ::ex-data)
 
@@ -370,15 +355,12 @@
   (datafy [x]
     (let [data (ex-data x)]
       (if-let [t (type data)]
-        (let [cause (ex-cause x)
-              deriving (parents t)]
+        (let [deriving (parents t)]
           (cond-> {::type t
                    ::message (ex-message x)
                    ::data (dissoc data :type ::type)}
             (seq deriving)
-            (assoc ::deriving deriving)
-            (some? cause)
-            (assoc ::cause (p/datafy cause))))
+            (assoc ::deriving deriving)))
         (Throwable->map x)))))
 
 (defn datafy
@@ -387,29 +369,17 @@
   (p/datafy ex))
 
 (s/fdef map->ex-info
-  :args (s/cat :ex-map (s/or :ex-map ::ex-map :throwable ::throwable)
+  :args (s/cat :ex-map ::ex-map
                :options (s/? (s/keys :opt [::derive?]))))
 (s/def ::derive? boolean?)
 (defn map->ex-info
   "Turns a datafy'ied ex/ex-info into an ex-info"
   ([m] (map->ex-info m {}))
-  ([{::keys [message type deriving data cause]
-     :keys [via]
-     :as m}
+  ([{::keys [message type deriving data cause]}
     {::keys [derive?] :or {derive? false}}]
-   (cond
-     (s/valid? ::ex-map m)
-     (ex-info message
-              (cond-> [type]
-                (and derive? (some? deriving))
-                (conj deriving))
-              data
-              (when cause (map->ex-info cause)))
-
-     (s/valid? ::throwable m)
-     (reduce (fn [e {:keys [message data] :or {data {}}}]
-               (if e
-                 (clojure.core/ex-info message data e)
-                 (clojure.core/ex-info message data)))
-             nil
-             (rseq via)))))
+   (ex-info message
+            (cond-> [type]
+              (and derive? (some? deriving))
+              (conj deriving))
+            data
+            (when cause (map->ex-info cause)))))
