@@ -346,9 +346,8 @@
   (s/keys :req [::message
                 ::type
                 ::data]
-          :opt [::deriving
-                ::cause]))
-(s/def ::cause ::ex-map)
+          :opt [::deriving]))
+
 (s/def ::data ::ex-data)
 
 (extend-protocol p/Datafiable
@@ -356,15 +355,12 @@
   (datafy [x]
     (let [data (ex-data x)]
       (if-let [t (type data)]
-        (let [cause (ex-cause x)
-              deriving (parents t)]
+        (let [deriving (parents t)]
           (cond-> {::type t
                    ::message (ex-message x)
                    ::data (dissoc data :type ::type)}
             (seq deriving)
-            (assoc ::deriving deriving)
-            (some? cause)
-            (assoc ::cause (p/datafy cause))))
+            (assoc ::deriving deriving)))
         (Throwable->map x)))))
 
 (defn datafy
