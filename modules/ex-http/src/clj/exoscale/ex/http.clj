@@ -17,13 +17,13 @@
 (defmacro def-response->ex [status type message]
   `(defmethod response->ex-info! ~status
      [response#]
-     (ex! ~message ~type response#)))
+     (ex! ~type ~message response#)))
 
 (def-response->ex :default :exoscale.ex/fault "HTTP Error")
 (def-response->ex 400 :exoscale.ex/incorrect "Bad Request")
 (def-response->ex 401 :exoscale.ex/forbidden "Unauthorized")
 (def-response->ex 403 :exoscale.ex/forbidden "Forbidden")
-(def-response->ex 404 :exoscale.ex/fault "HTTP Error")
+(def-response->ex 404 :exoscale.ex/not-found "Not Found")
 (def-response->ex 405 :exoscale.ex/unsupported "Method Not Allowed")
 (def-response->ex 409 :exoscale.ex/conflict "Conflict")
 (def-response->ex 429 :exoscale.ex/busy "Too Many Requests")
