@@ -9,7 +9,7 @@
 (defn- ex!
   [type message data]
   (throw (ex/ex-info message
-                     [:exoscale.ex.http/response-error [type]]
+                     [:exoscale.ex.http/response [type]]
                      (assoc data
                             ;; backward compat
                             :response data))))
