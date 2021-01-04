@@ -6,55 +6,29 @@
   Clients are expected to have already handled success status codes."
   :status)
 
-(defmethod response->ex-info!
-  :default
-  [resp] (ex/ex-fault! "HTTP Error" {:response resp}))
+(defn- ex!
+  [type message data]
+  (throw (ex/ex-info message
+                     [:exoscale.ex.http/response-error [type]]
+                     (assoc data
+                            ;; backward compat
+                            :response data))))
 
-(defmethod response->ex-info!
-  404
-  [resp] (ex/ex-not-found! "Not Found" {:response resp}))
+(defmacro def-response->ex [status type message]
+  `(defmethod response->ex-info! ~status
+     [response#]
+     (ex! ~message ~type response#)))
 
-(defmethod response->ex-info!
-  403
-  [resp] (ex/ex-forbidden! "Forbidden" {:response resp}))
-
-(defmethod response->ex-info!
-  401
-  [resp] (ex/ex-forbidden! "Unauthorized" {:response resp}))
-
-(defmethod response->ex-info!
-  400
-  [resp] (ex/ex-incorrect! "Bad Request" {:response resp}))
-
-(defmethod response->ex-info!
-  409
-  [resp] (ex/ex-conflict! "Conflict" {:response resp}))
-
-(defmethod response->ex-info!
-  405
-  [resp] (ex/ex-unsupported! "Method Not Allowed" {:response resp}))
-
-(defmethod response->ex-info!
-  429
-  [resp] (ex/ex-busy! "Too Many Requests" {:response resp}))
-
-(defmethod response->ex-info!
-  500
-  [resp] (ex/ex-fault! "Internal Server Error" {:response resp}))
-
-(defmethod response->ex-info!
-  501
-  [resp] (ex/ex-unsupported! "Not Implemented" {:response resp}))
-
-(defmethod response->ex-info!
-  503
-  [resp] (ex/ex-busy! "Service Unavailable" {:response resp}))
-
-(defmethod response->ex-info!
-  502
-  [resp] (ex/ex-unavailable! "Bad Gateway" {:response resp}))
-
-(defmethod response->ex-info!
-  504
-  [resp] (ex/ex-unavailable! "Gateway Timeout" {:response resp}))
-
+(def-response->ex :default :exoscale.ex/fault "HTTP Error")
+(def-response->ex 400 :exoscale.ex/incorrect "Bad Request")
+(def-response->ex 401 :exoscale.ex/forbidden "Unauthorized")
+(def-response->ex 403 :exoscale.ex/forbidden "Forbidden")
+(def-response->ex 404 :exoscale.ex/fault "HTTP Error")
+(def-response->ex 405 :exoscale.ex/unsupported "Method Not Allowed")
+(def-response->ex 409 :exoscale.ex/conflict "Conflict")
+(def-response->ex 429 :exoscale.ex/busy "Too Many Requests")
+(def-response->ex 500 :exoscale.ex/fault "Internal Server Error")
+(def-response->ex 501 :exoscale.ex/unsupported "Not Implemented")
+(def-response->ex 503 :exoscale.ex/busy "Service Unavailable")
+(def-response->ex 502 :exoscale.ex/unavailable "Bad Gateway")
+(def-response->ex 504 :exoscale.ex/unavailable "Gateway Timeout")
