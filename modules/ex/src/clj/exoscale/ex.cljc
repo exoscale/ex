@@ -315,6 +315,25 @@
 
 (run! (fn [t] (eval `(gen-ex-fn-for-type ~t))) types)
 
+(declare ex-unavailable
+         ex-unavailable!
+         ex-interrupted
+         ex-interrupted!
+         ex-incorrect
+         ex-incorrect!
+         ex-forbidden
+         ex-forbidden!
+         ex-unsupported
+         ex-unsupported!
+         ex-not-found
+         ex-not-found!
+         ex-conflict
+         ex-conflict!
+         ex-fault
+         ex-fault!
+         ex-busy
+         ex-busy!)
+
 (s/fdef ex-invalid-spec
   :args (s/cat :spec qualified-keyword?
                :x any?
