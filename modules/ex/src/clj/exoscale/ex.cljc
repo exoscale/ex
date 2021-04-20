@@ -276,6 +276,25 @@
 
 ;;; Sugar for common exceptions
 
+(declare ex-unavailable
+         ex-unavailable!
+         ex-interrupted
+         ex-interrupted!
+         ex-incorrect
+         ex-incorrect!
+         ex-forbidden
+         ex-forbidden!
+         ex-unsupported
+         ex-unsupported!
+         ex-not-found
+         ex-not-found!
+         ex-conflict
+         ex-conflict!
+         ex-fault
+         ex-fault!
+         ex-busy
+         ex-busy!)
+
 (defmacro ^:no-doc gen-ex-fn-for-type
   [type]
   (let [sym (symbol (str "ex-" (name type)))
@@ -313,26 +332,12 @@
          ([~msg ~data ~cause]
           (throw (~sym ~msg ~data ~cause)))))))
 
-(run! (fn [t] (eval `(gen-ex-fn-for-type ~t))) types)
+(defmacro gen-all-ex-fns!
+  []
+  `(do ~@(map (fn [type] `(gen-ex-fn-for-type ~type)) types)))
 
-(declare ex-unavailable
-         ex-unavailable!
-         ex-interrupted
-         ex-interrupted!
-         ex-incorrect
-         ex-incorrect!
-         ex-forbidden
-         ex-forbidden!
-         ex-unsupported
-         ex-unsupported!
-         ex-not-found
-         ex-not-found!
-         ex-conflict
-         ex-conflict!
-         ex-fault
-         ex-fault!
-         ex-busy
-         ex-busy!)
+(gen-all-ex-fns!)
+
 
 (s/fdef ex-invalid-spec
   :args (s/cat :spec qualified-keyword?
