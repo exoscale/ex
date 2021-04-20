@@ -338,7 +338,6 @@
 
 (gen-all-ex-fns!)
 
-
 (s/fdef ex-invalid-spec
   :args (s/cat :spec qualified-keyword?
                :x any?
