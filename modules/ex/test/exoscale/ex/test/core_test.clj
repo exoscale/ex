@@ -5,7 +5,8 @@
    [exoscale.ex.test :as t]
    [clojure.spec.alpha :as s]
    [clojure.spec.test.alpha]
-   [clojure.core.protocols :as p]))
+   [clojure.core.protocols :as p]
+   [clojure.inspector]))
 
 (clojure.spec.test.alpha/instrument)
 
@@ -128,8 +129,18 @@
                        (throw (ex-info "boom" {:exoscale.ex/type ::bar}))
                        (catch ::bar e# 1)))))))
 
-(deftest test-thrown-ex-data
+(deftest test-thrown-ex-type
   (is (thrown-ex-info-type? ::foo (throw (ex/ex-info "bar" ::foo)))))
+
+(deftest test-thrown-ex-msg
+  (is (thrown-with-ex-info-msg? ::foo #"bar" (throw (ex/ex-info "bar" ::foo)))))
+
+(deftest test-thrown-ex-cause
+  (let [x (ex/ex-info "bar"
+                      ::foo
+                      {:a 1
+                       :message "the-cause"})]
+    (is (thrown-with-ex-info-cause? ::foo #"the-cause" (throw x)))))
 
 (deftest test-type
   (is (ex/type? (ex/ex-info "bar" ::foo)
