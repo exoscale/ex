@@ -131,32 +131,6 @@ of a `catch` block in `try+` but with a more manifold like feel.
     (d/catch (fn [ex] "... regular manifold handling here")))
 ```
 
-### Specing your ex-infos data
-
-You can specify a clojure.spec for the `ex-data` via the multimethod at
-`:exoscale.ex/ex-data-spec` or via the sugar fn provided
-`exoscale.ex/set-ex-data-spec!`:
-
-```clj
-(ex/set-ex-data-spec! ::foo (s/keys :req [...] :opt [...]}))]}))`
-```
-
-By default this is enforced via `clojure.spec/assert`, meaning unless
-you toggled it "on" explicitely, it will be off.
-
-You can change this behavior and set the validator to something else
-like a log statement:
-
-```clj
-(ex/set-validator!
-  (fn [data]
-    (when-not (s/valid? ::ex/ex-data)
-      (log/warnf "ex-data caught doesn't match the spec for it's :type : %s" data))))
-```
-
-It is strongly discouraged to make this validation breaking the flow
-of execution in production as this would only show up at "catch time".
-
 ### How to get to the original exception
 
 You can also get the full exception instance via the metadata on the

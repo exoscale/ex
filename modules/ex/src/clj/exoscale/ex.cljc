@@ -1,6 +1,6 @@
 (ns exoscale.ex
   (:refer-clojure :exclude [ex-info derive underive ancestors descendants
-                            parents isa? set-validator! type])
+                            parents isa? type])
   (:require [clojure.spec.alpha :as s]
             [clojure.core.specs.alpha :as cs]
             [clojure.string :as str]
@@ -83,14 +83,6 @@
 (s/def ::type qualified-keyword?)
 (s/def ::ex-data (s/multi-spec ex-data-spec ::type))
 (s/def ::exception #(instance? Exception %))
-
-(s/fdef set-ex-data-spec!
-  :args (s/cat :type ::type
-               :spec (s/or :kw qualified-keyword?
-                           :spec-obj s/spec?)))
-(defn set-ex-data-spec!
-  [type spec]
-  (defmethod ex-data-spec type [_] spec))
 
 (def ^:no-doc catch-sym? #{'catch})
 
