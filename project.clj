@@ -1,4 +1,4 @@
-(defproject ex-parent "0.3.19-SNAPSHOT"
+(defproject ex-parent "0.4.0-SNAPSHOT"
   :description "In which we deal with exceptions the clojure way"
   :license             {:name "MIT/ISC"}
   :url                 "https://github.com/exoscale/ex"
