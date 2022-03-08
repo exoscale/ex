@@ -1,8 +1,6 @@
 # ex
 
-Exception handling library for clojure(+manifold)
-
-![ex](x.png)
+Exception handling library for clojure
 
 ## Api docs
 
