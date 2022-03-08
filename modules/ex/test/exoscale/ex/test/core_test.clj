@@ -117,12 +117,6 @@
                 x'
            (-> x' meta ::ex/exception (= x)))))))
 
-(deftest test-spec
-  (s/def ::foo string?)
-  (ex/set-ex-data-spec! ::a1 (s/keys :req [::foo]))
-  (is (false? (s/valid? ::ex/ex-data {:exoscale.ex/type ::a1})))
-  (is (true? (s/valid? ::ex/ex-data {:exoscale.ex/type ::a1 ::foo "bar"}))))
-
 (deftest test-within-eval
   (is (= 1 (eval `(do (ex/try+
                        (throw (ex-info "boom" {:exoscale.ex/type ::bar}))

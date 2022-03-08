@@ -1,6 +1,6 @@
 (ns exoscale.ex
   (:refer-clojure :exclude [ex-info derive underive ancestors descendants
-                            parents isa? set-validator! type])
+                            parents isa? type])
   (:require [clojure.spec.alpha :as s]
             [clojure.core.specs.alpha :as cs]
             [clojure.string :as str]
@@ -84,25 +84,6 @@
 (s/def ::ex-data (s/multi-spec ex-data-spec ::type))
 (s/def ::exception #(instance? Exception %))
 
-(s/fdef set-ex-data-spec!
-  :args (s/cat :type ::type
-               :spec (s/or :kw qualified-keyword?
-                           :spec-obj s/spec?)))
-(defn set-ex-data-spec!
-  [type spec]
-  (defmethod ex-data-spec type [_] spec))
-
-(defn ^:no-doc assert-ex-data-valid
-  "ex-data Validator function"
-  [ex-data]
-  (s/assert ::ex-data ex-data))
-
-#?(:clj
-   (defn set-validator!
-     "Sets validation failure handler globally"
-     [f]
-     (alter-var-root #'assert-ex-data-valid (constantly f))))
-
 (def ^:no-doc catch-sym? #{'catch})
 
 (defn ^:no-doc catch-expr?
@@ -153,7 +134,6 @@
   [e type-key handler continue]
   (if (type? e type-key)
     (let [d (ex-data e)]
-      (assert-ex-data-valid d)
       (handler (data+ex d e)))
     (continue e)))
 
@@ -227,10 +207,8 @@
                       (cond
                         ~@(mapcat (fn [[_ type binding & body]]
                                     `[(isa? ~type-sym ~type)
-                                      (do
-                                        (assert-ex-data-valid ~data-sym)
-                                        (let [~binding (data+ex ~data-sym ~ex-sym)]
-                                          ~@body))])
+                                      (let [~binding (data+ex ~data-sym ~ex-sym)]
+                                        ~@body)])
                                   catch-data-clauses)
                         :else
                         ;; rethrow ex-info with other clauses since we
@@ -268,7 +246,6 @@
          data' (assoc data
                       :type type' ; backward compatibility
                       ::type type')]
-     (assert-ex-data-valid data')
      (run! #(derive type' %) deriving)
      (clojure.core/ex-info msg
                            data'
