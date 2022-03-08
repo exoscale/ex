@@ -1,4 +1,4 @@
-(defproject exoscale/ex-manifold "0.4.0-SNAPSHOT"
+(defproject exoscale/ex-manifold "0.4.0"
   :plugins [[lein-parent "0.3.8"]]
   :parent-project {:path "../../project.clj"
                    :inherit [:managed-dependencies
