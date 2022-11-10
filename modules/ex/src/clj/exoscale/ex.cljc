@@ -297,9 +297,8 @@
                       :cause (s/? (s/nilable ::exception))))
 
        (defn ~sym
-         ~(str "Returns an ex-info with ex-data `:type` set to "
-               type ". Rest of the arguments match `ex-info`")
-         type
+         ~(str "Returns an ex-info with ex-data `:type` set to `"
+               type "`. Rest of the arguments match `ex-info`")
          ([~msg]
           (~sym ~msg nil nil))
          ([~msg ~data]
