@@ -4,7 +4,9 @@
   (:require [clojure.spec.alpha :as s]
             [clojure.core.specs.alpha :as cs]
             [clojure.string :as str]
-            [clojure.core.protocols :as p]))
+            [clojure.core.protocols :as p])
+  #?(:clj (:import (clojure.lang ExceptionInfo))
+     :cljs (:import (cljs.core ExceptionInfo))))
 
 (defonce hierarchy (atom (make-hierarchy)))
 
@@ -201,7 +203,7 @@
        ~@body
        ~@(cond-> regular-clauses
            (seq catch-data-clauses)
-           (conj `(catch clojure.lang.ExceptionInfo ~ex-sym
+           (conj `(catch ExceptionInfo ~ex-sym
                     (let [~data-sym (ex-data ~ex-sym)
                           ~type-sym (type ~data-sym)]
                       (cond
