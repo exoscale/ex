@@ -1,13 +1,11 @@
 (ns exoscale.ex
   (:refer-clojure :exclude [ex-info derive underive ancestors descendants
                             parents isa? type])
-  (:require [clojure.spec.alpha :as s]
-            [clojure.core.specs.alpha :as cs]
-            [clojure.string :as str]
+  (:require #?(:cljs [cljs.repl :as r])
             [clojure.core.protocols :as p]
-            #?(:cljs [cljs.repl :as r]))
-  #?(:clj (:import (clojure.lang ExceptionInfo))
-     :cljs (:import (cljs.core ExceptionInfo))))
+            [clojure.core.specs.alpha :as cs]
+            [clojure.spec.alpha :as s]
+            [clojure.string :as str]))
 
 (defonce hierarchy (atom (make-hierarchy)))
 
@@ -85,7 +83,8 @@
 (s/def ::message string?)
 (s/def ::type qualified-keyword?)
 (s/def ::ex-data (s/multi-spec ex-data-spec ::type))
-(s/def ::exception #(instance? Exception %))
+(s/def ::exception #(instance? #?(:clj Exception
+                                  :cljs js/Error) %))
 
 (def ^:no-doc catch-sym? #{'catch})
 
@@ -204,7 +203,7 @@
        ~@body
        ~@(cond-> regular-clauses
            (seq catch-data-clauses)
-           (conj `(catch ExceptionInfo ~ex-sym
+           (conj `(catch #?(:cljs ExceptionInfo :clj clojure.lang.ExceptionInfo) ~ex-sym
                     (let [~data-sym (ex-data ~ex-sym)
                           ~type-sym (type ~data-sym)]
                       (cond
@@ -357,7 +356,7 @@
 (s/def ::data ::ex-data)
 
 (extend-protocol p/Datafiable
-  ExceptionInfo
+  #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo)
   (datafy [x]
     (let [data (ex-data x)]
       (if-let [t (type data)]
