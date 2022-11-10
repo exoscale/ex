@@ -21,7 +21,7 @@
                       :expected '~form
                       :actual d#})
         (::ex/exception d#))
-      (catch Exception e#
+      (catch #?(:clj Exception :cljs :default) e#
         (t/do-report {:type :fail
                       :message ~msg
                       :expected '~form
