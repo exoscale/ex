@@ -4,7 +4,8 @@
   (:require [clojure.spec.alpha :as s]
             [clojure.core.specs.alpha :as cs]
             [clojure.string :as str]
-            [clojure.core.protocols :as p])
+            [clojure.core.protocols :as p]
+            #?(:cljs [cljs.repl :as r]))
   #?(:clj (:import (clojure.lang ExceptionInfo))
      :cljs (:import (cljs.core ExceptionInfo))))
 
@@ -222,6 +223,10 @@
   #{::unavailable ::interrupted ::incorrect ::forbidden ::unsupported
     ::not-found ::conflict ::fault ::busy})
 
+(def ^:private ex-info*
+  #?(:clj clojure.core/ex-info
+     :cljs cljs.core/ex-info))
+
 (s/fdef ex-info
   :args (s/cat :msg string?
                :type+deriving (s/or :type ::type
@@ -249,9 +254,9 @@
                       :type type' ; backward compatibility
                       ::type type')]
      (run! #(derive type' %) deriving)
-     (clojure.core/ex-info msg
-                           data'
-                           cause))))
+     (ex-info* msg
+               data'
+               cause))))
 
 ;;; Sugar for common exceptions
 
@@ -292,9 +297,9 @@
                       :cause (s/? (s/nilable ::exception))))
 
        (defn ~sym
-         ~(format (str "Returns an ex-info with ex-data `:type` set to %s. Rest of "
-                       "the arguments match `ex-info`")
-                  type)
+         ~(str "Returns an ex-info with ex-data `:type` set to "
+               type ". Rest of the arguments match `ex-info`")
+         type
          ([~msg]
           (~sym ~msg nil nil))
          ([~msg ~data]
@@ -303,7 +308,7 @@
           (ex-info ~msg ~type ~data ~cause)))
 
        (defn ~bangsym
-         ~(format "Builds an exception with %s and throws it." sym)
+         ~(str "Builds an exception with " sym " and throws it.")
          ([~msg]
           (throw (~sym ~msg nil nil)))
          ([~msg ~data]
@@ -326,7 +331,7 @@
   ([spec x]
    (ex-invalid-spec spec x nil))
   ([spec x data]
-   (exoscale.ex/ex-info (format "Invalid spec: %s" (s/explain-str spec x))
+   (exoscale.ex/ex-info (str "Invalid spec: " (s/explain-str spec x))
                         [::invalid-spec [::incorrect]]
                         (assoc data :explain-data (s/explain-data spec x)))))
 
@@ -353,7 +358,7 @@
 (s/def ::data ::ex-data)
 
 (extend-protocol p/Datafiable
-  clojure.lang.ExceptionInfo
+  ExceptionInfo
   (datafy [x]
     (let [data (ex-data x)]
       (if-let [t (type data)]
@@ -363,7 +368,8 @@
                    ::data (dissoc data :type ::type)}
             (seq deriving)
             (assoc ::deriving deriving)))
-        (Throwable->map x)))))
+        (#?(:clj Throwable->map
+            :cljs r/Error->map) x)))))
 
 (defn datafy
   "Convenience function to call datafy on a potential exception"
