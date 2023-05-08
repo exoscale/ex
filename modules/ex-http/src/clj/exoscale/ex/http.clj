@@ -1,5 +1,4 @@
-(ns exoscale.ex.http
-  (:require [exoscale.ex :as ex]))
+(ns exoscale.ex.http)
 
 (defmulti response->ex-info!
   "Throws the matching ex exception for status HTTP response.
@@ -8,11 +7,12 @@
 
 (defn- ex!
   [type message data]
-  (throw (ex/ex-info message
-                     [:exoscale.ex.http/response [type]]
-                     (assoc data
-                            ;; backward compat
-                            :response data))))
+  (throw (ex-info message
+                  (assoc data
+                         :exoscale.ex/type type
+                         ;; backward compat
+                         :type type
+                         :response data))))
 
 (defmacro def-response->ex [status type message]
   `(defmethod response->ex-info! ~status
