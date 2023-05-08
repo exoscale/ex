@@ -1,10 +1,10 @@
 (ns exoscale.ex
   (:refer-clojure :exclude [ex-info derive underive ancestors descendants
                             parents isa? type])
-  (:require [clojure.spec.alpha :as s]
+  (:require [clojure.core.protocols :as p]
             [clojure.core.specs.alpha :as cs]
-            [clojure.string :as str]
-            [clojure.core.protocols :as p]))
+            [clojure.spec.alpha :as s]
+            [clojure.string :as str]))
 
 (defonce hierarchy (atom (make-hierarchy)))
 
@@ -228,7 +228,7 @@
                :data (s/? (s/nilable ::ex-data))
                :cause (s/? (s/nilable ::exception))))
 (s/def ::deriving (s/coll-of ::type))
-(defn ex-info
+(defn ^:deprecated ex-info
   "Like `clojure.core/ex-info` but adds validation of the ex-data,
   automatic setting of the data `:type` from argument and potential
   derivation. You can specify type as either a keyword or a tuple of
@@ -242,6 +242,7 @@
          type' (cond-> type
                  coll-type?
                  first)
+         ;; TODO depreciate this, we shouldn't do auto-derivation here
          deriving (when coll-type? (second type))
          data' (assoc data
                       :type type' ; backward compatibility

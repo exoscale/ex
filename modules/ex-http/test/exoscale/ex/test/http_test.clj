@@ -32,9 +32,6 @@
   (testing "Should return ex/fault as the default option"
     (is (thrown-ex-info-type? ::ex/fault (ex-http/response->ex-info! {:status :not-mapped}))))
 
-  (is (thrown-ex-info-type? ::ex-http/response (ex-http/response->ex-info! {:status :not-mapped}))
-      "They all derive from top level ::ex-http/response")
-
   (testing "Should return ex/not-found for a 404"
     (is (thrown-ex-info-type? ::ex/not-found (ex-http/response->ex-info! {:status 404}))))
 
