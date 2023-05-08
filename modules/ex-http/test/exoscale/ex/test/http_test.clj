@@ -11,22 +11,22 @@
   (let [k (nth form 1)
         body (nthnext form 2)]
     `(ex/try+
-       ~@body
-       (t/do-report {:type :fail
-                     :message ~msg
-                     :expected '~form
-                     :actual nil})
-       (catch ~k d#
-         (t/do-report {:type :pass
-                       :message ~msg,
-                       :expected '~form
-                       :actual d#})
-         (::ex/exception d#))
-       (catch Exception e#
-         (t/do-report {:type :fail
-                       :message ~msg
-                       :expected '~form
-                       :actual e#})))))
+      ~@body
+      (t/do-report {:type :fail
+                    :message ~msg
+                    :expected '~form
+                    :actual nil})
+      (catch ~k d#
+        (t/do-report {:type :pass
+                      :message ~msg,
+                      :expected '~form
+                      :actual d#})
+        (::ex/exception d#))
+      (catch Exception e#
+        (t/do-report {:type :fail
+                      :message ~msg
+                      :expected '~form
+                      :actual e#})))))
 
 (deftest response->ex-info
   (testing "Should return ex/fault as the default option"
