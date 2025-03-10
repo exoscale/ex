@@ -1,7 +1,8 @@
 (ns exoscale.ex
   (:refer-clojure :exclude [ex-info derive underive ancestors descendants
                             parents isa? type])
-  (:require [clojure.core.protocols :as p]
+  (:require #?(:cljs [cljs.repl :as r])
+            [clojure.core.protocols :as p]
             [clojure.core.specs.alpha :as cs]
             [clojure.spec.alpha :as s]
             [clojure.string :as str]))
@@ -82,7 +83,8 @@
 (s/def ::message string?)
 (s/def ::type qualified-keyword?)
 (s/def ::ex-data (s/multi-spec ex-data-spec ::type))
-(s/def ::exception #(instance? Exception %))
+(s/def ::exception #(instance? #?(:clj Exception
+                                  :cljs js/Error) %))
 
 (def ^:no-doc catch-sym? #{'catch})
 
@@ -201,7 +203,7 @@
        ~@body
        ~@(cond-> regular-clauses
            (seq catch-data-clauses)
-           (conj `(catch clojure.lang.ExceptionInfo ~ex-sym
+           (conj `(catch #?(:cljs ExceptionInfo :clj clojure.lang.ExceptionInfo) ~ex-sym
                     (let [~data-sym (ex-data ~ex-sym)
                           ~type-sym (type ~data-sym)]
                       (cond
@@ -219,6 +221,10 @@
 (def types
   #{::unavailable ::interrupted ::incorrect ::forbidden ::unsupported
     ::not-found ::conflict ::fault ::busy})
+
+(def ^:private ex-info*
+  #?(:clj clojure.core/ex-info
+     :cljs cljs.core/ex-info))
 
 (s/fdef ex-info
   :args (s/cat :msg string?
@@ -248,9 +254,9 @@
                       :type type' ; backward compatibility
                       ::type type')]
      (run! #(derive type' %) deriving)
-     (clojure.core/ex-info msg
-                           data'
-                           cause))))
+     (ex-info* msg
+               data'
+               cause))))
 
 ;;; Sugar for common exceptions
 
@@ -291,9 +297,8 @@
                       :cause (s/? (s/nilable ::exception))))
 
        (defn ~sym
-         ~(format (str "Returns an ex-info with ex-data `:type` set to %s. Rest of "
-                       "the arguments match `ex-info`")
-                  type)
+         ~(str "Returns an ex-info with ex-data `:type` set to `"
+               type "`. Rest of the arguments match `ex-info`")
          ([~msg]
           (~sym ~msg nil nil))
          ([~msg ~data]
@@ -302,7 +307,7 @@
           (ex-info ~msg ~type ~data ~cause)))
 
        (defn ~bangsym
-         ~(format "Builds an exception with %s and throws it." sym)
+         ~(str "Builds an exception with " sym " and throws it.")
          ([~msg]
           (throw (~sym ~msg nil nil)))
          ([~msg ~data]
@@ -325,7 +330,7 @@
   ([spec x]
    (ex-invalid-spec spec x nil))
   ([spec x data]
-   (exoscale.ex/ex-info (format "Invalid spec: %s" (s/explain-str spec x))
+   (exoscale.ex/ex-info (str "Invalid spec: " (s/explain-str spec x))
                         [::invalid-spec [::incorrect]]
                         (assoc data :explain-data (s/explain-data spec x)))))
 
@@ -352,7 +357,7 @@
 (s/def ::data ::ex-data)
 
 (extend-protocol p/Datafiable
-  clojure.lang.ExceptionInfo
+  #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo)
   (datafy [x]
     (let [data (ex-data x)]
       (if-let [t (type data)]
@@ -362,7 +367,8 @@
                    ::data (dissoc data :type ::type)}
             (seq deriving)
             (assoc ::deriving deriving)))
-        (Throwable->map x)))))
+        (#?(:clj Throwable->map
+            :cljs r/Error->map) x)))))
 
 (defn datafy
   "Convenience function to call datafy on a potential exception"

@@ -1,5 +1,20 @@
 # ex
 
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 250" style="position:relative;top:0; left:0px;width:100px;height:50px;float:left;">
+  <!-- Background circle -->
+  <circle cx="10" cy="100" r="90" fill="#00000" />
+  
+  <!-- Inner circle -->
+  <circle cx="100" cy="100" r="75" fill="#FFFFFF"/>
+  
+  <!-- Stylized exception symbol -->
+  <path d="M70 70 L130 70 M70 100 L110 100 M70 130 L130 130" stroke="#000000" stroke-width="12" stroke-linecap="round" />
+  
+  <!-- Red exception indicator -->
+  <path d="M140 60 L110 130" stroke="#FC8181" stroke-width="10" stroke-linecap="round" />
+  <circle cx="110" cy="130" r="10" fill="#FC8181" />
+</svg>
+
 Exception handling library for clojure
 
 ## Api docs
