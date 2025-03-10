@@ -14,7 +14,14 @@ jobs:
          java-version: '11'
          distribution: 'zulu'
          architecture: 'x64'
+
+    - name: Install clojure tools
+      uses: DeLaGuardo/setup-clojure@master
+      with:
+        lein: 2.9.1
+         
     - name: Install dependencies
       run: lein sub install
+      
     - name: Run tests
       run: lein sub test
