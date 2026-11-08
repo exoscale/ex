@@ -1,4 +1,4 @@
-(defproject exoscale/ex-auspex "0.4.3"
+(defproject exoscale/ex-auspex "0.4.4-SNAPSHOT"
   :plugins [[lein-parent "0.3.8"]]
   :parent-project {:path "../../project.clj"
                    :inherit [:managed-dependencies
