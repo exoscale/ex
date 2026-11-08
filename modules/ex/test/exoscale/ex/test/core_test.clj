@@ -16,7 +16,7 @@
      (catch Exception e#
        e#)))
 
-(deftest test-catch
+(deftest test-try+
   (let [d {:exoscale.ex/type ::foo}]
     (is (= d
            (ex/try+
@@ -24,7 +24,7 @@
             (catch ::foo x
               x))))
 
-    (is (= d
+    (is (= {:type ::foo}
            (ex/try+
             (throw (ex-info "asdf" {:type ::foo}))
             (catch ::foo x
@@ -193,3 +193,20 @@
   (let  [x (clojure.core/ex-info "boom" {})]
     (is (false? (s/valid? ::ex/ex-map (p/datafy x)))
         "regular ex info is passthrough")))
+
+(deftest test-type-returns-boolean
+  (is (false? (ex/type? (Exception. "boom") ::foo)))
+  (is (false? (ex/type? nil ::foo))))
+
+(deftest test-try+-spec
+  (is (not (s/valid? ::ex/try$body ['(catch ::foo x x)]))
+      "catch clauses are not part of the body")
+  (is (= 1 (ex/try+ 1)) "no clauses")
+  (is (nil? (ex/try+ (catch ::foo x x))) "no body"))
+
+(deftest test-catch-spec
+  (is (thrown? Exception (ex/catch :not-an-exception ::foo identity identity))))
+
+(deftest test-throwable-cause
+  (let [cause (Error. "boom")]
+    (is (= cause (ex-cause (ex/ex-info "bar" ::foo nil cause))))))

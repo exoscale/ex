@@ -5,7 +5,8 @@
             [clojure.core.protocols :as p]
             [clojure.core.specs.alpha :as cs]
             [clojure.spec.alpha :as s]
-            [clojure.string :as str]))
+            [clojure.string :as str])
+  #?(:cljs (:require-macros [exoscale.ex])))
 
 (defonce hierarchy (atom (make-hierarchy)))
 
@@ -83,7 +84,7 @@
 (s/def ::message string?)
 (s/def ::type qualified-keyword?)
 (s/def ::ex-data (s/multi-spec ex-data-spec ::type))
-(s/def ::exception #(instance? #?(:clj Exception
+(s/def ::exception #(instance? #?(:clj Throwable
                                   :cljs js/Error) %))
 
 (def ^:no-doc catch-sym? #{'catch})
@@ -98,10 +99,15 @@
   (and (catch-expr? expr)
        (qualified-keyword? (second expr))))
 
+(defn ^:no-doc exception-class?
+  "Symbol naming an exception class, or `:default` (cljs catch-all)"
+  [x]
+  (or (symbol? x) (= :default x)))
+
 (defn ^:no-doc catch-exception-expr?
   [expr]
   (and (catch-expr? expr)
-       (symbol? (second expr))))
+       (exception-class? (second expr))))
 
 (defn ^:no-doc finally-expr?
   [expr]
@@ -121,9 +127,9 @@
 (defn type?
   "Returns true if `ex` is an ex-info with descendant/type of `type`"
   [ex t]
-  (some-> ex ex-type (isa? t)))
+  (boolean (some-> ex ex-type (isa? t))))
 
-(s/fdef catch*
+(s/fdef catch
   :args (s/cat :exception ::exception
                :type-key ::type
                :handler ifn?
@@ -141,7 +147,7 @@
 
 (s/def ::try$catch-exception
   (s/cat :clause catch-sym?
-         :class symbol?
+         :class exception-class?
          :binding symbol?
          :body (s/* any?)))
 
@@ -156,12 +162,11 @@
          :body (s/* any?)))
 
 (s/def ::try$body
-  (s/+ #(not (and (coll? %)
-                  (try-sub-clause (first %))))))
+  (s/* (complement (some-fn try-sub-clause finally-expr?))))
 
 (s/fdef try+
   :args (s/cat :body ::try$body
-               :clauses (s/+
+               :clauses (s/*
                          (s/or
                           :catch-exception ::try$catch-exception
                           :catch-data ::try$catch-data
@@ -199,12 +204,15 @@
         catch-data-clauses (filter catch-data-expr? mixed-clauses)
         type-sym (gensym "ex-type-")
         data-sym (gensym "ex-data-")
-        ex-sym '&ex]
+        ex-sym '&ex
+        ex-info-class (if (:ns &env)
+                        'cljs.core/ExceptionInfo
+                        'clojure.lang.ExceptionInfo)]
     `(try
        ~@body
        ~@(cond-> regular-clauses
            (seq catch-data-clauses)
-           (conj `(catch #?(:cljs ExceptionInfo :clj clojure.lang.ExceptionInfo) ~ex-sym
+           (conj `(catch ~ex-info-class ~ex-sym
                     (let [~data-sym (ex-data ~ex-sym)
                           ~type-sym (type ~data-sym)]
                       (cond
@@ -320,7 +328,9 @@
   []
   `(do ~@(map (fn [type] `(gen-ex-fn-for-type ~type)) types)))
 
-(gen-all-ex-fns!)
+;; qualified so cljs expands the macro instead of calling the cljs fn
+;; that defmacro also emits in this ns
+(exoscale.ex/gen-all-ex-fns!)
 
 (s/fdef ex-invalid-spec
   :args (s/cat :spec qualified-keyword?
