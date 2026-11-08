@@ -195,6 +195,7 @@
   [& xs]
   (let [[body mixed-clauses] (split-with (complement try-sub-clause) xs)
         regular-clauses (filter reg-expr? mixed-clauses)
+        catch-exception-clauses (filter catch-exception-expr? mixed-clauses)
         catch-data-clauses (filter catch-data-expr? mixed-clauses)
         type-sym (gensym "ex-type-")
         data-sym (gensym "ex-data-")
@@ -214,9 +215,9 @@
                                   catch-data-clauses)
                         :else
                         ;; rethrow ex-info with other clauses since we
-                        ;; have no match
+                        ;; have no match, finally is left to the outer try
                         (try (throw ~ex-sym)
-                             ~@regular-clauses)))))))))
+                             ~@catch-exception-clauses)))))))))
 
 (def types
   #{::unavailable ::interrupted ::incorrect ::forbidden ::unsupported

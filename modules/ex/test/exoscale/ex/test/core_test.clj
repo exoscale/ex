@@ -125,6 +125,28 @@
 (deftest test-thrown-ex-data
   (is (thrown-ex-info-type? ::foo (throw (ex/ex-info "bar" ::foo)))))
 
+(deftest test-finally-runs-once
+  (let [runs (atom 0)]
+    (try-val (ex/try+
+              (throw (ex-info "" {:exoscale.ex/type ::unmatched}))
+              (catch ::foo _ :caught)
+              (finally (swap! runs inc))))
+    (is (= 1 @runs) "unmatched ex-info"))
+
+  (let [runs (atom 0)]
+    (ex/try+
+     (throw (ex-info "" {:exoscale.ex/type ::foo}))
+     (catch ::foo _ :caught)
+     (finally (swap! runs inc)))
+    (is (= 1 @runs) "matched ex-info"))
+
+  (let [runs (atom 0)]
+    (try-val (ex/try+
+              (throw (Exception. "boom"))
+              (catch ::foo _ :caught)
+              (finally (swap! runs inc))))
+    (is (= 1 @runs) "plain exception")))
+
 (deftest test-type
   (is (ex/type? (ex/ex-info "bar" ::foo)
                 ::foo))
