@@ -1,4 +1,4 @@
-(defproject exoscale/ex "0.4.4-SNAPSHOT"
+(defproject exoscale/ex "0.4.4"
   :plugins [[lein-parent "0.3.8"]]
   :source-paths ["src/clj"]
   :parent-project {:path "../../project.clj"
